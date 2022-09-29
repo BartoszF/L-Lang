@@ -136,31 +136,31 @@ class Scanner(private val source: String) {
     private fun identifier() {
         while (isAlphaNumeric(peek())) advance()
         val text = source.substring(start, current)
-        var type = keywords!![text]
+        var type = keywords[text]
         if (type == null) type = TokenType.IDENTIFIER
         addToken(type)
     }
 
     companion object {
-        private var keywords: MutableMap<String, TokenType>? = mutableMapOf()
+        private var keywords: MutableMap<String, TokenType> = mutableMapOf()
 
         init {
-            keywords!!["and"] = TokenType.AND
-            keywords!!["class"] = TokenType.CLASS
-            keywords!!["else"] = TokenType.ELSE
-            keywords!!["false"] = TokenType.FALSE
-            keywords!!["for"] = TokenType.FOR
-            keywords!!["fun"] = TokenType.FUN
-            keywords!!["if"] = TokenType.IF
-            keywords!!["nil"] = TokenType.NIL
-            keywords!!["or"] = TokenType.OR
-            keywords!!["print"] = TokenType.PRINT
-            keywords!!["return"] = TokenType.RETURN
-            keywords!!["super"] = TokenType.SUPER
-            keywords!!["this"] = TokenType.THIS
-            keywords!!["true"] = TokenType.TRUE
-            keywords!!["var"] = TokenType.VAR
-            keywords!!["while"] = TokenType.WHILE
+            keywords["and"] = TokenType.AND
+            keywords["class"] = TokenType.CLASS
+            keywords["else"] = TokenType.ELSE
+            keywords["false"] = TokenType.FALSE
+            keywords["for"] = TokenType.FOR
+            keywords["fun"] = TokenType.FUN
+            keywords["if"] = TokenType.IF
+            keywords["nil"] = TokenType.NIL
+            keywords["or"] = TokenType.OR
+            keywords["print"] = TokenType.PRINT
+            keywords["return"] = TokenType.RETURN
+            keywords["super"] = TokenType.SUPER
+            keywords["this"] = TokenType.THIS
+            keywords["true"] = TokenType.TRUE
+            keywords["var"] = TokenType.VAR
+            keywords["while"] = TokenType.WHILE
         }
     }
 }

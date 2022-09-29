@@ -41,7 +41,7 @@ class Parser(private val tokens: List<Token>) {
         val name = consume(TokenType.IDENTIFIER, "Expect class name.")
 
         var superclass: Expr.Variable? = null
-        if(match(TokenType.COLON)) {
+        if (match(TokenType.COLON)) {
             consume(TokenType.IDENTIFIER, "Expect superclass name.")
             superclass = Expr.Variable(previous())
         }
@@ -84,7 +84,7 @@ class Parser(private val tokens: List<Token>) {
         if (match(TokenType.EQUAL)) {
             initializer = expression()
         }
-        consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.")
+//        consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.")
         return Statement.Var(name, initializer)
     }
 
@@ -106,6 +106,10 @@ class Parser(private val tokens: List<Token>) {
             varDeclaration()
         } else {
             expressionStatement()
+        }
+
+        if (initializer != null) {
+            consume(TokenType.SEMICOLON, "Expect ';' after initializer.")
         }
 
         var condition: Expr? = null
@@ -150,17 +154,17 @@ class Parser(private val tokens: List<Token>) {
 
     private fun printStatement(): Statement {
         val value = expression()
-        consume(TokenType.SEMICOLON, "Expect ';' after value.")
+        // consume(TokenType.SEMICOLON, "Expect ';' after value.")
         return Statement.Print(value)
     }
 
     private fun returnStatement(): Statement {
         val keyword = previous()
         var value: Expr? = null
-        if (!check(TokenType.SEMICOLON)) {
+        if (!check(TokenType.RIGHT_BRACE)) {
             value = expression()
         }
-        consume(TokenType.SEMICOLON, "Expect ';' after return value.")
+//        consume(TokenType.SEMICOLON, "Expect ';' after return value.")
         return Statement.Return(keyword, value)
     }
 
@@ -183,7 +187,7 @@ class Parser(private val tokens: List<Token>) {
 
     private fun expressionStatement(): Statement {
         val expr = expression()
-        consume(TokenType.SEMICOLON, "Expect ';' after expression.")
+//        consume(TokenType.SEMICOLON, "Expect ';' after expression.")
         return Statement.Expression(expr)
     }
 

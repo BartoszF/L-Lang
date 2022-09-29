@@ -1,7 +1,5 @@
 package pl.bfelis.fc93.language.ast
 
-import kotlin.math.exp
-
 class AstPrinter : Expr.Visitor<String> {
     fun print(expr: Expr): String {
         return expr.accept(this)
@@ -16,7 +14,7 @@ class AstPrinter : Expr.Visitor<String> {
     }
 
     override fun visitLiteralExpr(expr: Expr.Literal): String {
-        return if(expr.value == null) "nil" else expr.value.toString()
+        return if (expr.value == null) "nil" else expr.value.toString()
     }
 
     override fun visitUnaryExpr(expr: Expr.Unary): String {
@@ -59,6 +57,10 @@ class AstPrinter : Expr.Visitor<String> {
     }
 
     override fun visitThisExpr(expr: Expr.This): String {
+        TODO("Not yet implemented")
+    }
+
+    override fun visitSuperExpr(expr: Expr.Super): String {
         TODO("Not yet implemented")
     }
 }

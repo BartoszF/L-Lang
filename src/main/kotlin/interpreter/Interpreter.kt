@@ -236,7 +236,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
             methods[method.name.lexeme] = function
         }
 
-        val klass = LClass(statement.name.lexeme, superClass as LClass, methods)
+        val klass = LClass(statement.name.lexeme, superClass as LClass?, methods)
 
         if (superClass != null) {
             environment = environment.enclosing!!
@@ -278,7 +278,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
 
         val method = superclass.findMethod(expr.method.lexeme)
 
-        if(method == null) {
+        if (method == null) {
             throw RuntimeError(expr.method, "Undefined property '${expr.method.lexeme}'.")
         }
 
