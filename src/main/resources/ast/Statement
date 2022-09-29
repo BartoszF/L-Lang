@@ -1,0 +1,9 @@
+Block      : List<Statement?> statements
+Class      : Token name, Expr.Variable? superclass, List<Statement.Function> methods
+Expression : Expr expression
+Function   : Token name, List<Token> params, List<Statement?> body
+If         : Expr condition, Statement thenBranch, Statement? elseBranch
+Print      : Expr expression
+Return     : Token keyword, Expr? value
+Var        : Token name, Expr? initializer
+While      : Expr condition, Statement body
