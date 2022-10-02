@@ -33,7 +33,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         try {
             statements.forEach { it?.let { statement -> execute(statement) } }
         } catch (error: RuntimeError) {
-            throw error // TODO: Multiple errors. Don't interrupt when running.
+            throw error
         }
     }
 

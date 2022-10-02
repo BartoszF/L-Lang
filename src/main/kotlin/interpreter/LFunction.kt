@@ -22,7 +22,7 @@ class LFunction(
         try {
             interpreter.executeBlock(declaration.body, environment)
         } catch (retValue: Return) {
-            if(isInitializer) return closure.getAt(0, "this")
+            if (isInitializer) return closure.getAt(0, "this")
             return retValue.value
         }
 

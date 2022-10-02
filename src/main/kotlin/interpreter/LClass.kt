@@ -1,6 +1,6 @@
 package pl.bfelis.fc93.language.interpreter
 
-class LClass(
+open class LClass(
     val name: String,
     val superclass: LClass? = null,
     val methods: MutableMap<String, LFunction> = mutableMapOf()

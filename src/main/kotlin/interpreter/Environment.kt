@@ -35,6 +35,16 @@ data class Environment(val enclosing: Environment? = null, val values: MutableMa
         throw RuntimeError(name, "Undefined variable '${name.lexeme}'")
     }
 
+    fun getByName(name: String): Any? {
+        if (values.containsKey(name)) {
+            return values[name]
+        }
+
+        if (enclosing != null) return enclosing.getByName(name)
+
+        throw RuntimeError(null, "Undefined variable '$name'")
+    }
+
     fun getAt(distance: Int, name: String): Any? {
         return ancestor(distance).values[name]
     }

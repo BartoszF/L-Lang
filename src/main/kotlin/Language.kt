@@ -8,7 +8,8 @@ import pl.bfelis.fc93.language.scanner.Token
 import pl.bfelis.fc93.language.scanner.TokenType
 
 class Language {
-    private val interpreter = Interpreter()
+    val interpreter = Interpreter()
+    val resolver = Resolver(interpreter)
 
     fun run(source: String) {
         val scanner = Scanner(source)
