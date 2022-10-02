@@ -18,7 +18,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
             object : LCallable {
                 override fun arity(): Int = 0
 
-                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any? {
+                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any {
                     return System.currentTimeMillis().toDouble() / 1000.0
                 }
 
@@ -37,7 +37,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         }
     }
 
-    override fun visitBinaryExpr(expr: Expr.Binary): Any? {
+    override fun visitBinaryExpr(expr: Expr.Binary): Any {
         val left = evaluate(expr.left)
         val right = evaluate(expr.right)
 
@@ -46,6 +46,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
                 checkNumberOperand(expr.operator, right)
                 return (left as Double) - (right as Double)
             }
+
             TokenType.PLUS -> {
                 if (left is Double && right is Double) {
                     return left + right
@@ -61,32 +62,38 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
                 checkNumberOperands(expr.operator, left, right)
                 return (left as Double) / (right as Double)
             }
+
             TokenType.STAR -> {
                 checkNumberOperands(expr.operator, left, right)
                 return (left as Double) * (right as Double)
             }
+
             TokenType.GREATER -> {
                 checkNumberOperands(expr.operator, left, right)
                 return (left as Double) > (right as Double)
             }
+
             TokenType.GREATER_EQUAL -> {
                 checkNumberOperands(expr.operator, left, right)
                 return (left as Double) > (right as Double)
             }
+
             TokenType.LESS -> {
                 checkNumberOperands(expr.operator, left, right)
                 return (left as Double) < (right as Double)
             }
+
             TokenType.LESS_EQUAL -> {
                 checkNumberOperands(expr.operator, left, right)
                 return (left as Double) < (right as Double)
             }
+
             TokenType.BANG -> return !isEqual(left, right)
             TokenType.BANG_EQUAL -> return isEqual(left, right)
+            else -> {
+                throw RuntimeError(expr.operator, "Wrong binary expresion")
+            } // TODO: More exhaustive error
         }
-
-        // Unreachable.
-        return null
     }
 
     override fun visitGroupingExpr(expr: Expr.Grouping): Any? {
@@ -97,19 +104,20 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         return expr.value
     }
 
-    override fun visitUnaryExpr(expr: Expr.Unary): Any? {
+    override fun visitUnaryExpr(expr: Expr.Unary): Any {
         val right = evaluate(expr.right)
 
-        when (expr.operator.type) {
-            TokenType.BANG -> return !isTruthy(right)
+        return when (expr.operator.type) {
+            TokenType.BANG -> !isTruthy(right)
             TokenType.MINUS -> {
                 checkNumberOperand(expr.operator, right)
-                return -(right as Double)
+                -(right as Double)
+            }
+
+            else -> {
+                throw RuntimeError(expr.operator, "Wrong unary expression")
             }
         }
-
-        // Unreachable.
-        return null
     }
 
     override fun visitExpressionStatement(statement: Statement.Expression) {
@@ -205,7 +213,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
 
     override fun visitFunctionStatement(statement: Statement.Function) {
         val function = LFunction(statement, environment)
-        environment.define(statement.name!!.lexeme, function)
+        environment.define(statement.name.lexeme, function)
     }
 
     override fun visitReturnStatement(statement: Statement.Return) {
@@ -267,7 +275,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         return value
     }
 
-    override fun visitSuperExpr(expr: Expr.Super): Any? {
+    override fun visitSuperExpr(expr: Expr.Super): Any {
         val distance = locals[expr]!!
         val superclass = environment.getAt(
             distance,
@@ -277,10 +285,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         val obj = environment.getAt(distance - 1, "this") as LInstance
 
         val method = superclass.findMethod(expr.method.lexeme)
-
-        if (method == null) {
-            throw RuntimeError(expr.method, "Undefined property '${expr.method.lexeme}'.")
-        }
+            ?: throw RuntimeError(expr.method, "Undefined property '${expr.method.lexeme}'.")
 
         return method.bind(obj)
     }

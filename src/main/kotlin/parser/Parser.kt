@@ -345,6 +345,7 @@ class Parser(private val tokens: List<Token>) {
             if (previous().type === TokenType.SEMICOLON) return
             when (peek().type) {
                 TokenType.CLASS, TokenType.FUN, TokenType.VAR, TokenType.FOR, TokenType.IF, TokenType.WHILE, TokenType.PRINT, TokenType.RETURN -> return
+                else -> {}
             }
             advance()
         }
