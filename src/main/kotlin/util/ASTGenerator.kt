@@ -15,7 +15,7 @@ class ASTGenerator {
                 exitProcess(64)
             }
             val outputDir = args[0]
-            listOf("Expr","Statement").forEach {
+            listOf("Expr", "Statement").forEach {
                 val lines = object {}.javaClass.getResourceAsStream("/ast/$it")?.bufferedReader()?.readLines()
                 defineAst(outputDir, it, lines!!)
             }

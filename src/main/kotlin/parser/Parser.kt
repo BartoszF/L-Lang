@@ -280,17 +280,29 @@ class Parser(private val tokens: List<Token>) {
         return call()
     }
 
+    private fun accessor(callee: Expr): Expr {
+        val rest = term()
+
+        consume(TokenType.RIGHT_BRACKET, "Expect closing ].")
+        val accessorToken = previous()
+
+        return Expr.Accessor(callee, rest, accessorToken)
+    }
+
     private fun call(): Expr {
-        var expr: Expr = primary()
+        var expr = primary()
         while (true) {
-            if (match(TokenType.LEFT_PAREN)) {
-                expr = finishCall(expr)
+            expr = if (match(TokenType.LEFT_PAREN)) {
+                finishCall(expr)
             } else if (match(TokenType.DOT)) {
                 val name = consume(TokenType.IDENTIFIER, "Expect property name after '.'.")
-                expr = Expr.Get(expr, name)
+                Expr.Get(expr, name)
             } else {
                 break
             }
+        }
+        if (match(TokenType.LEFT_BRACKET)) {
+            expr = accessor(expr)
         }
         return expr
     }

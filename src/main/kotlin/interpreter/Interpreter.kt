@@ -290,6 +290,29 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         return method.bind(obj)
     }
 
+    override fun visitAccessorExpr(expr: Expr.Accessor): Any? {
+        val variable = evaluate(expr.obj)
+        val accessor = try {
+            (evaluate(expr.accessor) as Double).toInt()
+        } catch (ex: Exception) {
+            throw RuntimeError(expr.accessorToken, "Wrong data type for accessor.")
+        }
+
+        if (variable is Array<*>) {
+            return variable[accessor]
+        }
+
+        if (variable is List<*>) {
+            return variable[accessor]
+        }
+
+        if (variable is CharSequence) {
+            return variable[accessor]
+        }
+
+        throw RuntimeError(expr.accessorToken, "Variable is not iterable.")
+    }
+
     override fun visitThisExpr(expr: Expr.This): Any? {
         return lookupVariable(expr.keyword, expr)
     }

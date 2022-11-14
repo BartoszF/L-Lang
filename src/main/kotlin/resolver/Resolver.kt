@@ -159,6 +159,11 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
         resolveLocal(expr, expr.keyword)
     }
 
+    override fun visitAccessorExpr(expr: Expr.Accessor) {
+        resolve(expr.obj)
+        resolve(expr.accessor)
+    }
+
     override fun visitGetExpr(expr: Expr.Get) {
         resolve(expr.obj)
     }
@@ -243,7 +248,9 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
     private fun checkUnusedVariables() {
         val block = identifiers.peek()
         for ((name, usage) in block) {
-            Language.warn(name, "Unused variable.")
+            if (usage == 0) {
+                Language.warn(name, "Unused variable.")
+            }
         }
     }
 }

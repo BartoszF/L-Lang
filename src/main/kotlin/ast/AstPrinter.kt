@@ -1,8 +1,26 @@
 package pl.bfelis.fc93.language.ast
 
-class AstPrinter : Expr.Visitor<String> {
-    fun print(expr: Expr): String {
+class AstPrinter : Expr.Visitor<String>, Statement.Visitor<String> {
+
+    var indent = -1
+
+    private fun currentIndent(plus: Int? = 0): String {
+        return "\t".repeat(indent + (plus ?: 0))
+    }
+
+    fun printExpr(expr: Expr): String {
         return expr.accept(this)
+    }
+
+    fun printStatement(statement: Statement?): String {
+        return statement?.accept(this) ?: ""
+    }
+
+    fun printStatements(statements: List<Statement?>): String {
+        indent++
+        val res = statements.joinToString(System.lineSeparator()) { currentIndent() + printStatement(it) }
+        indent--
+        return res
     }
 
     override fun visitBinaryExpr(expr: Expr.Binary): String {
@@ -33,34 +51,94 @@ class AstPrinter : Expr.Visitor<String> {
     }
 
     override fun visitVariableExpr(expr: Expr.Variable): String {
-        TODO("Not yet implemented")
+        return "(Variable ${expr.name.lexeme})"
     }
 
     override fun visitAssignExpr(expr: Expr.Assign): String {
-        TODO("Not yet implemented")
+        return "(Assign ${expr.name.lexeme}=${parenthesize(expr.name.lexeme, expr.value)})"
     }
 
     override fun visitLogicalExpr(expr: Expr.Logical): String {
-        TODO("Not yet implemented")
+        return "(Logical ${parenthesize(expr.operator.lexeme, expr.left, expr.right)})"
     }
 
     override fun visitCallExpr(expr: Expr.Call): String {
-        TODO("Not yet implemented")
+        return parenthesize("Call", *expr.arguments.toTypedArray())
     }
 
     override fun visitGetExpr(expr: Expr.Get): String {
-        TODO("Not yet implemented")
+        return "(Getter ${expr.obj.accept(this)}.${expr.name.lexeme})"
     }
 
     override fun visitSetExpr(expr: Expr.Set): String {
-        TODO("Not yet implemented")
+        return "(Setter ${expr.obj.accept(this)}.${expr.name.lexeme} = ${printExpr(expr.value)})"
     }
 
     override fun visitThisExpr(expr: Expr.This): String {
-        TODO("Not yet implemented")
+        return "(${expr.keyword.lexeme})"
     }
 
     override fun visitSuperExpr(expr: Expr.Super): String {
-        TODO("Not yet implemented")
+        return "(super ${expr.method.lexeme} ${expr.keyword.lexeme})"
+    }
+
+    override fun visitAccessorExpr(expr: Expr.Accessor): String {
+        return "(accessor ${expr.obj.accept(this)} [${expr.accessor.accept(this)}]}"
+    }
+
+    override fun visitBlockStatement(statement: Statement.Block): String {
+        return """(Block 
+            |${printStatements(statement.statements)}
+            |${currentIndent()})
+        """.trimMargin()
+    }
+
+    override fun visitClassStatement(statement: Statement.Class): String {
+        return """(Class 
+            |${currentIndent(1)}(name ${statement.name.lexeme}):${statement.superclass?.accept(this) ?: "no superclass"} 
+            |${printStatements(statement.methods)}
+            |${currentIndent()})
+        """.trimMargin()
+    }
+
+    override fun visitExpressionStatement(statement: Statement.Expression): String {
+        return parenthesize("expression", statement.expression)
+    }
+
+    override fun visitFunctionStatement(statement: Statement.Function): String {
+        return """(Function ${statement.name.lexeme}
+            |${currentIndent(1)}(params [${statement.params.joinToString(", ")}]) 
+            |${printStatements(statement.body)}
+            |${currentIndent()})
+        """.trimMargin()
+    }
+
+    override fun visitIfStatement(statement: Statement.If): String {
+        return """(If ${statement.condition.accept(this)}
+            |${currentIndent(1)}${statement.thenBranch.accept(this)} 
+            |${currentIndent(1)}(ELSE 
+            |${currentIndent(1)}${statement.elseBranch?.accept(this)}
+            |${currentIndent()})
+        """.trimIndent()
+    }
+
+    override fun visitPrintStatement(statement: Statement.Print): String {
+        return "(Print ${statement.expression.accept(this)})"
+    }
+
+    override fun visitReturnStatement(statement: Statement.Return): String {
+        return "(Return ${statement.keyword.lexeme} ${statement.value?.accept(this)})"
+    }
+
+    override fun visitVarStatement(statement: Statement.Var): String {
+        return "(Var ${statement.name.lexeme} = ${statement.initializer?.accept(this) ?: "EMPTY"})"
+    }
+
+    override fun visitWhileStatement(statement: Statement.While): String {
+        return """(While 
+            |${currentIndent(1)}${parenthesize("condition", statement.condition)}
+            |${currentIndent(1)}${statement.body.accept(this)}
+            |${currentIndent()})
+        """.trimMargin()
     }
 }

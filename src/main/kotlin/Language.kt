@@ -1,5 +1,6 @@
 package pl.bfelis.fc93.language
 
+import pl.bfelis.fc93.language.ast.AstPrinter
 import pl.bfelis.fc93.language.interpreter.Interpreter
 import pl.bfelis.fc93.language.parser.Parser
 import pl.bfelis.fc93.language.resolver.Resolver
@@ -10,10 +11,13 @@ import pl.bfelis.fc93.language.scanner.TokenType
 class Language {
     val interpreter = Interpreter()
     val resolver = Resolver(interpreter)
+    val printer = AstPrinter()
 
     fun run(source: String) {
         val scanner = Scanner(source)
         val tokens = scanner.scanTokens()
+
+        tokens.map { println(it.toString()) }
 
         if (hadError) return
 
@@ -26,6 +30,8 @@ class Language {
 
         if (hadError) return
 
+        val a = printer.printStatements(statements)
+        println(a)
         interpreter.interpret(statements)
     }
 
