@@ -6,8 +6,8 @@ import pl.bfelis.fc93.language.interpreter.native.LIterable
 val ArrayMethods = { env: Environment ->
     mutableMapOf(
         "init" to
-            getMethodForLClass("init", listOf("size"), true, env),
-        "size" to getMethodForLClass("size", emptyList(), false, env)
+            getNativeMethodForLClass("init", listOf("size"), true, env),
+        "size" to getNativeMethodForLClass("size", emptyList(), false, env)
     )
 }
 

@@ -6,7 +6,7 @@ import pl.bfelis.fc93.language.interpreter.LFunction
 import pl.bfelis.fc93.language.scanner.Token
 import pl.bfelis.fc93.language.scanner.TokenType
 
-fun getMethodForLClass(name: String, params: List<String>, isInit: Boolean, env: Environment): LFunction {
+fun getNativeMethodForLClass(name: String, params: List<String>, isInit: Boolean, env: Environment): LFunction {
     return LFunction(
         Statement.Function(
             Token(TokenType.FUN, name, name, -1),
