@@ -11,6 +11,7 @@ abstract class Expr {
         fun visitSetExpr(expr: Set): R
         fun visitSuperExpr(expr: Super): R
         fun visitAccessorExpr(expr: Accessor): R
+        fun visitAccessorSetExpr(expr: AccessorSet): R
         fun visitThisExpr(expr: This): R
         fun visitGroupingExpr(expr: Grouping): R
         fun visitLiteralExpr(expr: Literal): R
@@ -90,6 +91,16 @@ abstract class Expr {
 
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitAccessorExpr(this)
+        }
+    }
+
+    class AccessorSet(
+        val accessor: Expr.Accessor,
+        val value: Expr
+    ) : Expr() {
+
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitAccessorSetExpr(this)
         }
     }
 

@@ -203,7 +203,10 @@ class Parser(private val tokens: List<Token>) {
                 return Assign(name, value)
             } else if (expr is Expr.Get) {
                 return Expr.Set(expr.obj, expr.name, value)
+            } else if (expr is Expr.Accessor) {
+                return Expr.AccessorSet(expr, value)
             }
+            println("DEBUG: $expr")
             Language.error(equals, "Invalid assignment target.")
         }
         return expr
@@ -284,7 +287,7 @@ class Parser(private val tokens: List<Token>) {
         val rest = term()
 
         consume(TokenType.RIGHT_BRACKET, "Expect closing ].")
-        val accessorToken = previous()
+        val accessorToken = tokens[current - 2]
 
         return Expr.Accessor(callee, rest, accessorToken)
     }

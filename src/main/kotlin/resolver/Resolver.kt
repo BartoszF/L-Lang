@@ -164,6 +164,11 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
         resolve(expr.accessor)
     }
 
+    override fun visitAccessorSetExpr(expr: Expr.AccessorSet) {
+        resolve(expr.accessor)
+        resolve(expr.value)
+    }
+
     override fun visitGetExpr(expr: Expr.Get) {
         resolve(expr.obj)
     }

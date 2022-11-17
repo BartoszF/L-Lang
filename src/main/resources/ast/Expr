@@ -1,13 +1,14 @@
-Assign   : Token name, Expr value
-Binary   : Expr left, Token operator, Expr right
-Call     : Expr callee, Token paren, List<Expr> arguments
-Get      : Expr obj, Token name
-Set      : Expr obj, Token name, Expr value
-Super    : Token keyword, Token method
-Accessor : Expr obj, Expr accessor, Token accessorToken
-This     : Token keyword
-Grouping : Expr expression
-Literal  : Any? value
-Logical  : Expr left, Token operator, Expr right
-Unary    : Token operator, Expr right
-Variable : Token name
+Assign          : Token name, Expr value
+Binary          : Expr left, Token operator, Expr right
+Call            : Expr callee, Token paren, List<Expr> arguments
+Get             : Expr obj, Token name
+Set             : Expr obj, Token name, Expr value
+Super           : Token keyword, Token method
+Accessor        : Expr obj, Expr accessor, Token accessorToken
+AccessorSet     : Expr.Accessor accessor, Expr value
+This            : Token keyword
+Grouping        : Expr expression
+Literal         : Any? value
+Logical         : Expr left, Token operator, Expr right
+Unary           : Token operator, Expr right
+Variable        : Token name

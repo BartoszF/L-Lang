@@ -2,6 +2,7 @@ package pl.bfelis.fc93.language.interpreter
 
 import pl.bfelis.fc93.language.ast.Expr
 import pl.bfelis.fc93.language.ast.Statement
+import pl.bfelis.fc93.language.interpreter.native.LIterable
 import pl.bfelis.fc93.language.parser.Return
 import pl.bfelis.fc93.language.scanner.Token
 import pl.bfelis.fc93.language.scanner.TokenType
@@ -13,20 +14,9 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
     private val locals: MutableMap<Expr, Int> = mutableMapOf()
 
     init {
-        globals.define(
-            "clock",
-            object : LCallable {
-                override fun arity(): Int = 0
-
-                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any {
-                    return System.currentTimeMillis().toDouble() / 1000.0
-                }
-
-                override fun toString(): String {
-                    return "<native fn>"
-                }
-            }
-        )
+        Globals.values(globals).map {
+            globals.define(it.key, it.value)
+        }
     }
 
     fun interpret(statements: List<Statement?>) {
@@ -108,7 +98,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         val right = evaluate(expr.right)
 
         return when (expr.operator.type) {
-            TokenType.BANG -> !isTruthy(right)
+            TokenType.BANG -> !Utils.isTruthy(right)
             TokenType.MINUS -> {
                 checkNumberOperand(expr.operator, right)
                 -(right as Double)
@@ -126,7 +116,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
 
     override fun visitPrintStatement(statement: Statement.Print) {
         val value = evaluate(statement.expression)
-        println(stringify(value))
+        println(Utils.stringify(value))
     }
 
     override fun visitVariableExpr(expr: Expr.Variable): Any? {
@@ -160,7 +150,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
     }
 
     override fun visitIfStatement(statement: Statement.If) {
-        if (isTruthy(evaluate(statement.condition))) {
+        if (Utils.isTruthy(evaluate(statement.condition))) {
             execute(statement.thenBranch)
         } else if (statement.elseBranch != null) {
             execute(statement.elseBranch)
@@ -171,16 +161,16 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         val left = evaluate(expr.left)
 
         if (expr.operator.type === TokenType.OR) {
-            if (isTruthy(left)) return left
+            if (Utils.isTruthy(left)) return left
         } else {
-            if (!isTruthy(left)) return left
+            if (!Utils.isTruthy(left)) return left
         }
 
         return evaluate(expr.right)
     }
 
     override fun visitWhileStatement(statement: Statement.While) {
-        while (isTruthy(evaluate(statement.condition))) {
+        while (Utils.isTruthy(evaluate(statement.condition))) {
             execute(statement.body)
         }
     }
@@ -258,6 +248,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
             return obj[expr.name]
         }
 
+        println(obj)
         throw RuntimeError(
             expr.name,
             "Only instances have properties."
@@ -293,24 +284,65 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
     override fun visitAccessorExpr(expr: Expr.Accessor): Any? {
         val variable = evaluate(expr.obj)
         val accessor = try {
-            (evaluate(expr.accessor) as Double).toInt()
+            (evaluate(expr.accessor) as Double)
         } catch (ex: Exception) {
             throw RuntimeError(expr.accessorToken, "Wrong data type for accessor.")
         }
 
         if (variable is Array<*>) {
-            return variable[accessor]
+            return variable[accessor.toInt()]
         }
 
         if (variable is List<*>) {
-            return variable[accessor]
+            return variable[accessor.toInt()]
         }
 
         if (variable is CharSequence) {
-            return variable[accessor]
+            return variable[accessor.toInt()]
+        }
+
+        if (variable is LIterable) {
+            return variable.at(accessor)
         }
 
         throw RuntimeError(expr.accessorToken, "Variable is not iterable.")
+    }
+
+    override fun visitAccessorSetExpr(expr: Expr.AccessorSet): Any? {
+        val variable = evaluate(expr.accessor.obj)
+        val accessor = try {
+            (evaluate(expr.accessor.accessor) as Double)
+        } catch (ex: Exception) {
+            throw RuntimeError(expr.accessor.accessorToken, "Wrong data type for accessor.")
+        }
+
+        val value = evaluate(expr.value)
+
+        if (variable is LIterable) {
+            return variable.set(accessor, value)
+        }
+
+        if (variable is Array<*>) {
+            @Suppress("UNCHECKED_CAST")
+            (variable as Array<Any?>)[accessor.toInt()] = value
+            return variable
+        }
+
+        if (variable is MutableList<*>) {
+            @Suppress("UNCHECKED_CAST")
+            (variable as MutableList<Any?>)[accessor.toInt()] = value
+            return variable
+        }
+
+        if (variable is String) {
+            val array = variable.toCharArray()
+            array[accessor.toInt()] = if (value is String) value[0] else value as Char
+            val newString = String(array)
+            environment.assign((expr.accessor.obj as Expr.Variable).name, newString)
+            return variable
+        }
+
+        throw RuntimeError(expr.accessor.accessorToken, "Variable is not iterable.")
     }
 
     override fun visitThisExpr(expr: Expr.This): Any? {
@@ -353,11 +385,6 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         }
     }
 
-    private fun isTruthy(obj: Any?): Boolean {
-        if (obj == null) return false
-        return if (obj is Boolean) obj else true
-    }
-
     private fun isEqual(a: Any?, b: Any?): Boolean {
         if (a == null && b == null) return true
         return if (a == null) false else a == b
@@ -375,17 +402,5 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
     ) {
         if (left is Double && right is Double) return
         throw RuntimeError(operator, "Operands must be numbers.")
-    }
-
-    private fun stringify(obj: Any?): String {
-        if (obj == null) return "nil"
-        if (obj is Double) {
-            var text = obj.toString()
-            if (text.endsWith(".0")) {
-                text = text.substring(0, text.length - 2)
-            }
-            return text
-        }
-        return obj.toString()
     }
 }

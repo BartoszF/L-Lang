@@ -86,6 +86,10 @@ class AstPrinter : Expr.Visitor<String>, Statement.Visitor<String> {
         return "(accessor ${expr.obj.accept(this)} [${expr.accessor.accept(this)}]}"
     }
 
+    override fun visitAccessorSetExpr(expr: Expr.AccessorSet): String {
+        return parenthesize("accessorSet", expr.accessor, expr.value)
+    }
+
     override fun visitBlockStatement(statement: Statement.Block): String {
         return """(Block 
             |${printStatements(statement.statements)}
