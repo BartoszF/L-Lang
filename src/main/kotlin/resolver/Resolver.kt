@@ -6,6 +6,7 @@ import pl.bfelis.fc93.language.ast.Expr.Assign
 import pl.bfelis.fc93.language.ast.Statement
 import pl.bfelis.fc93.language.interpreter.Interpreter
 import pl.bfelis.fc93.language.scanner.Token
+import pl.bfelis.fc93.language.scanner.TokenType
 import java.util.*
 
 class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Visitor<Unit> {
@@ -101,6 +102,13 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
     override fun visitLogicalExpr(expr: Expr.Logical) {
         resolve(expr.left)
         resolve(expr.right)
+    }
+
+    override fun visitLambdaExpr(expr: Expr.Lambda) {
+        resolveFunction(
+            Statement.Function(Token(TokenType.FUN, "anonymous", "anonymous", -1), expr.params, expr.body),
+            FunctionType.FUNCTION
+        )
     }
 
     override fun visitUnaryExpr(expr: Expr.Unary) {

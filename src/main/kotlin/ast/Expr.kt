@@ -16,6 +16,7 @@ abstract class Expr {
         fun visitGroupingExpr(expr: Grouping): R
         fun visitLiteralExpr(expr: Literal): R
         fun visitLogicalExpr(expr: Logical): R
+        fun visitLambdaExpr(expr: Lambda): R
         fun visitUnaryExpr(expr: Unary): R
         fun visitVariableExpr(expr: Variable): R
     }
@@ -139,6 +140,17 @@ abstract class Expr {
 
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitLogicalExpr(this)
+        }
+    }
+
+    class Lambda(
+        val line: Int,
+        val params: List<Token>,
+        val body: List<Statement?>
+    ) : Expr() {
+
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitLambdaExpr(this)
         }
     }
 

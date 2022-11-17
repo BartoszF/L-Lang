@@ -327,6 +327,23 @@ class Parser(private val tokens: List<Token>) {
         return Expr.Call(callee, paren, arguments)
     }
 
+    private fun lambda(): Expr {
+        consume(TokenType.LEFT_PAREN, "Expect '(' after function literal")
+        val parameters = mutableListOf<Token>()
+        if (!check(TokenType.RIGHT_PAREN)) {
+            do {
+                if (parameters.size >= 255) {
+                    Language.error(peek(), "Cannot have more than 255 parameters")
+                }
+                parameters.add(consume(TokenType.IDENTIFIER, "Expect parameters name."))
+            } while (match(TokenType.COMMA))
+        }
+        consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.")
+        consume(TokenType.LEFT_BRACE, "Expect '(' before function literal body")
+        val body: List<Statement?> = block()
+        return Expr.Lambda(previous().line, parameters, body)
+    }
+
     private fun primary(): Expr {
         if (match(TokenType.FALSE)) return Expr.Literal(false)
         if (match(TokenType.TRUE)) return Expr.Literal(true)
@@ -343,6 +360,10 @@ class Parser(private val tokens: List<Token>) {
         }
         if (match(TokenType.THIS)) return Expr.This(previous())
         if (match(TokenType.IDENTIFIER)) return Expr.Variable(previous())
+
+        if (match(TokenType.FUN)) {
+            return lambda()
+        }
 
         if (match(TokenType.LEFT_PAREN)) {
             val expr = expression()

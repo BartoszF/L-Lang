@@ -62,8 +62,15 @@ class AstPrinter : Expr.Visitor<String>, Statement.Visitor<String> {
         return "(Logical ${parenthesize(expr.operator.lexeme, expr.left, expr.right)})"
     }
 
+    override fun visitLambdaExpr(expr: Expr.Lambda): String {
+        return """(Lambda params: ${expr.params}
+            |${currentIndent(1)}${printStatements(expr.body)}
+            |)
+        """.trimMargin()
+    }
+
     override fun visitCallExpr(expr: Expr.Call): String {
-        return parenthesize("Call", *expr.arguments.toTypedArray())
+        return parenthesize("Call", expr.callee, *expr.arguments.toTypedArray())
     }
 
     override fun visitGetExpr(expr: Expr.Get): String {

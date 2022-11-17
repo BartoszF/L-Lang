@@ -169,6 +169,12 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         return evaluate(expr.right)
     }
 
+    override fun visitLambdaExpr(expr: Expr.Lambda): Any {
+        val func = Statement.Function(Token(TokenType.IDENTIFIER, "Lambda", null, expr.line), expr.params, expr.body)
+
+        return LFunction(func, environment, false)
+    }
+
     override fun visitWhileStatement(statement: Statement.While) {
         while (Utils.isTruthy(evaluate(statement.condition))) {
             execute(statement.body)
