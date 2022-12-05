@@ -9,20 +9,28 @@ import pl.bfelis.fc93.language.scanner.Token
 import pl.bfelis.fc93.language.scanner.TokenType
 import java.util.*
 
+data class IdentifierDefinition(val token: Token, val isVal: Boolean = false)
+
 class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Visitor<Unit> {
-    private val identifiers: Stack<MutableMap<Token, Int>> = Stack()
+    private val identifiers: Stack<MutableMap<IdentifierDefinition, Int>> = Stack()
     private val scopes: Stack<MutableMap<String, Boolean>> = Stack()
     private var currentFunction = FunctionType.NONE
     private var currentClass = ClassType.CLASS
 
     override fun visitBlockStatement(statement: Statement.Block) {
-        beginScope()
-        resolve(statement.statements)
-        endScope()
+        resolve(statement.statements, true)
     }
 
     override fun visitVarStatement(statement: Statement.Var) {
         declare(statement.name)
+        if (statement.initializer != null) {
+            resolve(statement.initializer)
+        }
+        define(statement.name)
+    }
+
+    override fun visitValStatement(statement: Statement.Val) {
+        declare(statement.name, true)
         if (statement.initializer != null) {
             resolve(statement.initializer)
         }
@@ -41,6 +49,11 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
     override fun visitAssignExpr(expr: Assign) {
         resolve(expr.value)
         resolveLocal(expr, expr.name)
+
+        val key = identifiers.peek().filterKeys { it.token.lexeme == expr.name.lexeme }.keys.first()
+        if (key.isVal) {
+            Language.error(expr.name, "val cannot be reassigned.")
+        }
     }
 
     override fun visitFunctionStatement(statement: Statement.Function) {
@@ -193,16 +206,26 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
         resolveLocal(expr, expr.keyword)
     }
 
-    fun resolve(statements: List<Statement?>) {
+    fun resolve(statements: List<Statement?>, shouldCreateScope: Boolean = true) {
+        if (shouldCreateScope) {
+            beginScope()
+        }
         for (statement in statements) {
             resolve(statement)
+        }
+        if (shouldCreateScope) {
+            checkUnusedVariables()
+            endScope()
         }
     }
 
     private fun resolveLocal(expr: Expr, name: Token) {
         for (i in scopes.indices.reversed()) {
             if (scopes[i].containsKey(name.lexeme)) {
-                identifiers[i].remove(name)
+                if (identifiers[i].isNotEmpty()) {
+                    val key = identifiers[i].filterKeys { it.token.lexeme == name.lexeme }.keys.first()
+                    identifiers[i][key] = identifiers[i][key]!! - 1
+                }
                 interpreter.resolve(expr, scopes.size - 1 - i)
                 return
             }
@@ -217,26 +240,28 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
             declare(param)
             define(param)
         }
-        resolve(function.body)
+        resolve(function.body, false)
         checkUnusedVariables()
         endScope()
         currentFunction = enclosingFunction
     }
 
-    private fun declare(name: Token) {
+    private fun declare(name: Token, isVal: Boolean = false) {
         if (scopes.isEmpty() && identifiers.isEmpty()) return
 
         val scope: MutableMap<String, Boolean> = scopes.peek()
-        val block: MutableMap<Token, Int> = identifiers.peek()
+        val block: MutableMap<IdentifierDefinition, Int> = identifiers.peek()
         if (scope.containsKey(name.lexeme)) {
             Language.error(name, "Already a variable with this name in this scope")
         }
+
         scope[name.lexeme] = false
-        block[name] = 0
+        block[IdentifierDefinition(name, isVal)] = 0
     }
 
     private fun define(name: Token) {
         if (scopes.isEmpty() && identifiers.isEmpty()) return
+
         scopes.peek()[name.lexeme] = true
     }
 
@@ -260,9 +285,9 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
 
     private fun checkUnusedVariables() {
         val block = identifiers.peek()
-        for ((name, usage) in block) {
+        for ((definition, usage) in block) {
             if (usage == 0) {
-                Language.warn(name, "Unused variable.")
+                Language.warn(definition.token, "Unused variable.")
             }
         }
     }

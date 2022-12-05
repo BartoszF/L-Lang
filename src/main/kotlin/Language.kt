@@ -17,7 +17,7 @@ class Language {
         val scanner = Scanner(source)
         val tokens = scanner.scanTokens()
 
-        tokens.map { println(it.toString()) }
+//        tokens.map { println(it.toString()) }
 
         if (hadError) return
 
@@ -26,12 +26,13 @@ class Language {
 
         if (hadError) return
 
+        val a = printer.printStatements(statements)
+        println(a)
+
         Resolver(interpreter).resolve(statements)
 
         if (hadError) return
 
-        val a = printer.printStatements(statements)
-        println(a)
         interpreter.interpret(statements)
     }
 

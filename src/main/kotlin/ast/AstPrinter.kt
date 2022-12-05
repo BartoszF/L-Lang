@@ -32,7 +32,7 @@ class AstPrinter : Expr.Visitor<String>, Statement.Visitor<String> {
     }
 
     override fun visitLiteralExpr(expr: Expr.Literal): String {
-        return if (expr.value == null) "nil" else expr.value.toString()
+        return "(Literal ${if (expr.value == null) "nil" else expr.value.toString()})"
     }
 
     override fun visitUnaryExpr(expr: Expr.Unary): String {
@@ -55,7 +55,7 @@ class AstPrinter : Expr.Visitor<String>, Statement.Visitor<String> {
     }
 
     override fun visitAssignExpr(expr: Expr.Assign): String {
-        return "(Assign ${expr.name.lexeme}=${parenthesize(expr.name.lexeme, expr.value)})"
+        return "(Assign ${expr.name.lexeme} ${expr.value.accept(this)})"
     }
 
     override fun visitLogicalExpr(expr: Expr.Logical): String {
@@ -142,7 +142,11 @@ class AstPrinter : Expr.Visitor<String>, Statement.Visitor<String> {
     }
 
     override fun visitVarStatement(statement: Statement.Var): String {
-        return "(Var ${statement.name.lexeme} = ${statement.initializer?.accept(this) ?: "EMPTY"})"
+        return "(Var ${statement.name.lexeme} = ${statement.initializer?.accept(this) ?: "nil"})"
+    }
+
+    override fun visitValStatement(statement: Statement.Val): String {
+        return "(Val ${statement.name.lexeme} = ${statement.initializer?.accept(this) ?: "nil"})"
     }
 
     override fun visitWhileStatement(statement: Statement.While): String {

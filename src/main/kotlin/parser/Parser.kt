@@ -29,6 +29,7 @@ class Parser(private val tokens: List<Token>) {
             if (match(TokenType.CLASS)) return classDeclaration()
             if (match(TokenType.FUN)) return function("function")
             if (match(TokenType.VAR)) return varDeclaration()
+            if (match(TokenType.VAL)) return valDeclaration()
 
             return statement()
         } catch (e: ParserError) {
@@ -84,8 +85,21 @@ class Parser(private val tokens: List<Token>) {
         if (match(TokenType.EQUAL)) {
             initializer = expression()
         }
-//        consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.")
+
         return Statement.Var(name, initializer)
+    }
+
+    private fun valDeclaration(): Statement {
+        val name = consume(TokenType.IDENTIFIER, "Expect variable name.")
+        val initializer: Expr
+        if (match(TokenType.EQUAL)) {
+            initializer = expression()
+        } else {
+            Language.error(name, "val needs initializer.")
+            throw ParserError(name, "val needs initializer.")
+        }
+
+        return Statement.Val(name, initializer)
     }
 
     private fun statement(): Statement {
@@ -154,7 +168,6 @@ class Parser(private val tokens: List<Token>) {
 
     private fun printStatement(): Statement {
         val value = expression()
-        // consume(TokenType.SEMICOLON, "Expect ';' after value.")
         return Statement.Print(value)
     }
 
@@ -164,7 +177,6 @@ class Parser(private val tokens: List<Token>) {
         if (!check(TokenType.RIGHT_BRACE)) {
             value = expression()
         }
-//        consume(TokenType.SEMICOLON, "Expect ';' after return value.")
         return Statement.Return(keyword, value)
     }
 
@@ -187,7 +199,6 @@ class Parser(private val tokens: List<Token>) {
 
     private fun expressionStatement(): Statement {
         val expr = expression()
-//        consume(TokenType.SEMICOLON, "Expect ';' after expression.")
         return Statement.Expression(expr)
     }
 
@@ -198,16 +209,22 @@ class Parser(private val tokens: List<Token>) {
         if (match(TokenType.EQUAL)) {
             val equals = previous()
             val value = assignment()
-            if (expr is Expr.Variable) {
-                val name = expr.name
-                return Assign(name, value)
-            } else if (expr is Expr.Get) {
-                return Expr.Set(expr.obj, expr.name, value)
-            } else if (expr is Expr.Accessor) {
-                return Expr.AccessorSet(expr, value)
+            when (expr) {
+                is Expr.Variable -> {
+                    val name = expr.name
+                    return Assign(name, value)
+                }
+
+                is Expr.Get -> {
+                    return Expr.Set(expr.obj, expr.name, value)
+                }
+
+                is Expr.Accessor -> {
+                    return Expr.AccessorSet(expr, value)
+                }
+
+                else -> Language.error(equals, "Invalid assignment target.")
             }
-            println("DEBUG: $expr")
-            Language.error(equals, "Invalid assignment target.")
         }
         return expr
     }

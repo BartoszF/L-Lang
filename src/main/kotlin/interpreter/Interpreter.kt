@@ -120,7 +120,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
     }
 
     override fun visitVariableExpr(expr: Expr.Variable): Any? {
-        return lookupVariable(expr.name, expr) // environment.get(expr.name)
+        return lookupVariable(expr.name, expr)
     }
 
     override fun visitVarStatement(statement: Statement.Var) {
@@ -132,8 +132,19 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         environment.define(statement.name.lexeme, value)
     }
 
+    override fun visitValStatement(statement: Statement.Val) {
+        var value: Any? = null
+        if (statement.initializer != null) {
+            value = evaluate(statement.initializer)
+        }
+
+        environment.define(statement.name.lexeme, value)
+    }
+
     override fun visitAssignExpr(expr: Expr.Assign): Any? {
         val value = evaluate(expr.value)
+
+        println("ASSIGN: ${expr.name} ${expr.value}")
 
         val distance = locals[expr]
         if (distance != null) {

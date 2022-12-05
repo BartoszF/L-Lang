@@ -12,6 +12,7 @@ abstract class Statement {
         fun visitPrintStatement(statement: Print): R
         fun visitReturnStatement(statement: Return): R
         fun visitVarStatement(statement: Var): R
+        fun visitValStatement(statement: Val): R
         fun visitWhileStatement(statement: While): R
     }
 
@@ -92,6 +93,16 @@ abstract class Statement {
 
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitVarStatement(this)
+        }
+    }
+
+    class Val(
+        val name: Token,
+        val initializer: Expr?
+    ) : Statement() {
+
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitValStatement(this)
         }
     }
 

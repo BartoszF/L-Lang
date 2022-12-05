@@ -22,7 +22,7 @@ data class Environment(val enclosing: Environment? = null, val values: MutableMa
     }
 
     fun assignAt(distance: Int, name: Token, value: Any?) {
-        ancestor(distance).values[name.lexeme] = value
+        ancestor(distance).assign(name, value)
     }
 
     fun get(name: Token): Any? {

@@ -162,6 +162,7 @@ class Scanner(private val source: String) {
             keywords["this"] = TokenType.THIS
             keywords["true"] = TokenType.TRUE
             keywords["var"] = TokenType.VAR
+            keywords["val"] = TokenType.VAL
             keywords["while"] = TokenType.WHILE
         }
     }
