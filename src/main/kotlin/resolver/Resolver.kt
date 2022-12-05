@@ -50,7 +50,9 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
         resolve(expr.value)
         resolveLocal(expr, expr.name)
 
-        val key = identifiers.peek().filterKeys { it.token.lexeme == expr.name.lexeme }.keys.first()
+        val key = identifiers.indices.reversed()
+            .firstNotNullOf { identifiers[it].filterKeys { k -> k.token.lexeme == expr.name.lexeme }.keys.firstOrNull() }
+
         if (key.isVal) {
             Language.error(expr.name, "val cannot be reassigned.")
         }

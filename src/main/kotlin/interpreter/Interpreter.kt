@@ -144,8 +144,6 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
     override fun visitAssignExpr(expr: Expr.Assign): Any? {
         val value = evaluate(expr.value)
 
-        println("ASSIGN: ${expr.name} ${expr.value}")
-
         val distance = locals[expr]
         if (distance != null) {
             environment.assignAt(distance, expr.name, value)
