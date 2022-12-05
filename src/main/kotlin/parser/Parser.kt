@@ -275,10 +275,53 @@ class Parser(private val tokens: List<Token>) {
         var expr: Expr = factor()
         while (match(TokenType.MINUS, TokenType.PLUS)) {
             val operator = previous()
-            val right: Expr = factor()
-            expr = Expr.Binary(expr, operator, right)
+
+            expr = incDec(operator, expr)
         }
         return expr
+    }
+
+    private fun incDec(operator: Token, expr: Expr): Expr {
+        return if (peek().type == TokenType.EQUAL) {
+            incDecAssignment(operator, previous(2))
+        } else {
+            when (peek().type) {
+                TokenType.PLUS -> {
+                    val identifier = previous(2)
+                    advance()
+                    Expr.Increment(identifier)
+                }
+
+                TokenType.MINUS -> {
+                    val identifier = previous(2)
+                    advance()
+                    Expr.Decrement(identifier)
+                }
+
+                else -> {
+                    val right: Expr = factor()
+                    Expr.Binary(expr, operator, right)
+                }
+            }
+        }
+    }
+
+    private fun incDecAssignment(operator: Token, identifier: Token): Expr {
+        advance()
+        return when (operator.type) {
+            TokenType.PLUS -> {
+                Expr.AssignIncrement(identifier, expression())
+            }
+
+            TokenType.MINUS -> {
+                Expr.AssignDecrement(identifier, expression())
+            }
+
+            else -> {
+                Language.error(operator, "Unknown assignment operator ${operator.lexeme}")
+                throw ParserError(operator, "Unknown assignment operator ${operator.lexeme}")
+            }
+        }
     }
 
     private fun factor(): Expr {
@@ -439,5 +482,9 @@ class Parser(private val tokens: List<Token>) {
 
     private fun previous(): Token {
         return tokens[current - 1]
+    }
+
+    private fun previous(distance: Int): Token {
+        return tokens[current - distance]
     }
 }

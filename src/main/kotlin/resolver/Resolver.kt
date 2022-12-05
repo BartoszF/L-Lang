@@ -46,6 +46,14 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
         resolveLocal(expr, expr.name)
     }
 
+    override fun visitIncrementExpr(expr: Expr.Increment) {
+        resolveLocal(expr, expr.name)
+    }
+
+    override fun visitDecrementExpr(expr: Expr.Decrement) {
+        resolveLocal(expr, expr.name)
+    }
+
     override fun visitAssignExpr(expr: Assign) {
         resolve(expr.value)
         resolveLocal(expr, expr.name)
@@ -56,6 +64,16 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
         if (key.isVal) {
             Language.error(expr.name, "val cannot be reassigned.")
         }
+    }
+
+    override fun visitAssignIncrementExpr(expr: Expr.AssignIncrement) {
+        resolve(expr.value)
+        resolveLocal(expr, expr.name)
+    }
+
+    override fun visitAssignDecrementExpr(expr: Expr.AssignDecrement) {
+        resolve(expr.value)
+        resolveLocal(expr, expr.name)
     }
 
     override fun visitFunctionStatement(statement: Statement.Function) {

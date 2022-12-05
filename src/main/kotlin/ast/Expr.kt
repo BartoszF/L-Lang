@@ -5,6 +5,8 @@ import pl.bfelis.fc93.language.scanner.Token
 abstract class Expr {
     interface Visitor<R> {
         fun visitAssignExpr(expr: Assign): R
+        fun visitAssignIncrementExpr(expr: AssignIncrement): R
+        fun visitAssignDecrementExpr(expr: AssignDecrement): R
         fun visitBinaryExpr(expr: Binary): R
         fun visitCallExpr(expr: Call): R
         fun visitGetExpr(expr: Get): R
@@ -19,6 +21,8 @@ abstract class Expr {
         fun visitLambdaExpr(expr: Lambda): R
         fun visitUnaryExpr(expr: Unary): R
         fun visitVariableExpr(expr: Variable): R
+        fun visitIncrementExpr(expr: Increment): R
+        fun visitDecrementExpr(expr: Decrement): R
     }
 
     class Assign(
@@ -28,6 +32,26 @@ abstract class Expr {
 
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitAssignExpr(this)
+        }
+    }
+
+    class AssignIncrement(
+        val name: Token,
+        val value: Expr
+    ) : Expr() {
+
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitAssignIncrementExpr(this)
+        }
+    }
+
+    class AssignDecrement(
+        val name: Token,
+        val value: Expr
+    ) : Expr() {
+
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitAssignDecrementExpr(this)
         }
     }
 
@@ -170,6 +194,24 @@ abstract class Expr {
 
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitVariableExpr(this)
+        }
+    }
+
+    class Increment(
+        val name: Token
+    ) : Expr() {
+
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitIncrementExpr(this)
+        }
+    }
+
+    class Decrement(
+        val name: Token
+    ) : Expr() {
+
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitDecrementExpr(this)
         }
     }
 

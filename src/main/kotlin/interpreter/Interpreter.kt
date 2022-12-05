@@ -123,6 +123,36 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         return lookupVariable(expr.name, expr)
     }
 
+    override fun visitIncrementExpr(expr: Expr.Increment): Any {
+        val value = lookupVariable(expr.name, expr)
+
+        if (value !is Double) throw RuntimeError(expr.name, "Only numbers can be incremented")
+
+        val distance = locals[expr]
+        if (distance != null) {
+            environment.assignAt(distance, expr.name, value + 1)
+        } else {
+            globals.assign(expr.name, value + 1)
+        }
+
+        return value
+    }
+
+    override fun visitDecrementExpr(expr: Expr.Decrement): Any {
+        val value = lookupVariable(expr.name, expr)
+
+        if (value !is Double) throw RuntimeError(expr.name, "Only numbers can be decremented")
+
+        val distance = locals[expr]
+        if (distance != null) {
+            environment.assignAt(distance, expr.name, value - 1)
+        } else {
+            globals.assign(expr.name, value - 1)
+        }
+
+        return value
+    }
+
     override fun visitVarStatement(statement: Statement.Var) {
         var value: Any? = null
         if (statement.initializer != null) {
@@ -152,6 +182,40 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         }
 
         return value
+    }
+
+    override fun visitAssignIncrementExpr(expr: Expr.AssignIncrement): Any {
+        val value = evaluate(expr.value)
+        val currentValue = lookupVariable(expr.name, expr)
+
+        if (value !is Double) throw RuntimeError(expr.name, "Only numbers can be incremented")
+        if (currentValue !is Double) throw RuntimeError(expr.name, "Only numbers can be incremented")
+
+        val distance = locals[expr]
+        if (distance != null) {
+            environment.assignAt(distance, expr.name, currentValue + value)
+        } else {
+            globals.assign(expr.name, value)
+        }
+
+        return currentValue + value
+    }
+
+    override fun visitAssignDecrementExpr(expr: Expr.AssignDecrement): Any {
+        val value = evaluate(expr.value)
+        val currentValue = lookupVariable(expr.name, expr)
+
+        if (value !is Double) throw RuntimeError(expr.name, "Only numbers can be decremented")
+        if (currentValue !is Double) throw RuntimeError(expr.name, "Only numbers can be decremented")
+
+        val distance = locals[expr]
+        if (distance != null) {
+            environment.assignAt(distance, expr.name, currentValue - value)
+        } else {
+            globals.assign(expr.name, value)
+        }
+
+        return currentValue - value
     }
 
     override fun visitBlockStatement(statement: Statement.Block) {

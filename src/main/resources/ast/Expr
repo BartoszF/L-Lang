@@ -1,4 +1,6 @@
 Assign          : Token name, Expr value
+AssignIncrement : Token name, Expr value
+AssignDecrement : Token name, Expr value
 Binary          : Expr left, Token operator, Expr right
 Call            : Expr callee, Token paren, List<Expr> arguments
 Get             : Expr obj, Token name
@@ -13,3 +15,5 @@ Logical         : Expr left, Token operator, Expr right
 Lambda          : Int line, List<Token> params, List<Statement?> body
 Unary           : Token operator, Expr right
 Variable        : Token name
+Increment       : Token name
+Decrement       : Token name

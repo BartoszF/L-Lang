@@ -54,8 +54,24 @@ class AstPrinter : Expr.Visitor<String>, Statement.Visitor<String> {
         return "(Variable ${expr.name.lexeme})"
     }
 
+    override fun visitIncrementExpr(expr: Expr.Increment): String {
+        return "(Increment ${expr.name.lexeme})"
+    }
+
+    override fun visitDecrementExpr(expr: Expr.Decrement): String {
+        return "(Decrement ${expr.name.lexeme})"
+    }
+
     override fun visitAssignExpr(expr: Expr.Assign): String {
-        return "(Assign ${expr.name.lexeme} ${expr.value.accept(this)})"
+        return "(Assign ${expr.name.lexeme} = ${expr.value.accept(this)})"
+    }
+
+    override fun visitAssignIncrementExpr(expr: Expr.AssignIncrement): String {
+        return "(Assign ${expr.name.lexeme} += ${expr.value.accept(this)}"
+    }
+
+    override fun visitAssignDecrementExpr(expr: Expr.AssignDecrement): String {
+        return "(Assign ${expr.name.lexeme} -= ${expr.value.accept(this)}"
     }
 
     override fun visitLogicalExpr(expr: Expr.Logical): String {
