@@ -448,6 +448,7 @@ class Parser(private val tokens: List<Token>) {
 
     private fun consume(type: TokenType, message: String): Token {
         if (check(type)) return advance()
+        LRuntime.error(ParserError(peek(), message))
         throw ParserError(peek(), message)
     }
 

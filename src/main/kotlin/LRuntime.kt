@@ -16,10 +16,15 @@ class LRuntime(private val debug: Boolean = false) {
         val scanner = Scanner(source)
         val tokens = scanner.scanTokens()
 
+        if (debug) {
+            tokens.forEach { println(it) }
+        }
+
         errorNotifier.register(errorPrinter)
 
         if (hadError) {
             errorNotifier.notifyErrors()
+            return
         }
 
         val parser = Parser(tokens)
@@ -27,6 +32,7 @@ class LRuntime(private val debug: Boolean = false) {
 
         if (hadError) {
             errorNotifier.notifyErrors()
+            return
         }
 
         if (debug) {

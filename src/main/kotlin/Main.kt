@@ -59,8 +59,7 @@ private fun run(source: String) {
 fun resolverError(error: ResolverError) {
     System.err.println(
         """
-            ${error.message} {${error.token?.lexeme}}
-            [line ${error.token?.line}]
+            [line ${error.token?.line}] ${error.message} {${error.token?.lexeme}}
         """.trimIndent()
     )
 }
@@ -68,8 +67,7 @@ fun resolverError(error: ResolverError) {
 fun runtimeError(error: RuntimeError) {
     System.err.println(
         """
-            ${error.message}
-            [line ${error.token!!.line}]
+            [line ${error.token!!.line}] ${error.message}
         """.trimIndent()
     )
 }
