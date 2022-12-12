@@ -2,8 +2,8 @@ package pl.bfelis.fc93.language.interpreter
 
 import pl.bfelis.fc93.language.ast.Expr
 import pl.bfelis.fc93.language.ast.Statement
+import pl.bfelis.fc93.language.interpreter.native.Globals
 import pl.bfelis.fc93.language.interpreter.native.LIterable
-import pl.bfelis.fc93.language.parser.Return
 import pl.bfelis.fc93.language.scanner.Token
 import pl.bfelis.fc93.language.scanner.TokenType
 

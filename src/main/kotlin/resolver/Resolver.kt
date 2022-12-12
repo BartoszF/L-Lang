@@ -1,6 +1,6 @@
 package pl.bfelis.fc93.language.resolver
 
-import pl.bfelis.fc93.language.Language
+import pl.bfelis.fc93.language.LRuntime
 import pl.bfelis.fc93.language.ast.Expr
 import pl.bfelis.fc93.language.ast.Expr.Assign
 import pl.bfelis.fc93.language.ast.Statement
@@ -41,7 +41,7 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
         if (!scopes.isEmpty() &&
             scopes.peek()[expr.name.lexeme] === java.lang.Boolean.FALSE
         ) {
-            Language.error(expr.name, "Can't read local variable in its own initializer.")
+            LRuntime.error(expr.name, "Can't read local variable in its own initializer.")
         }
         resolveLocal(expr, expr.name)
     }
@@ -62,7 +62,7 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
             .firstNotNullOf { identifiers[it].filterKeys { k -> k.token.lexeme == expr.name.lexeme }.keys.firstOrNull() }
 
         if (key.isVal) {
-            Language.error(expr.name, "val cannot be reassigned.")
+            LRuntime.error(expr.name, "val cannot be reassigned.")
         }
     }
 
@@ -98,11 +98,11 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
 
     override fun visitReturnStatement(statement: Statement.Return) {
         if (currentFunction != FunctionType.FUNCTION) {
-            Language.error(statement.keyword, "Can't return from top-level code.")
+            LRuntime.error(statement.keyword, "Can't return from top-level code.")
         }
         if (statement.value != null) {
             if (currentFunction == FunctionType.INITIALIZER) {
-                Language.error(statement.keyword, "Can't return a value from an initializer.")
+                LRuntime.error(statement.keyword, "Can't return a value from an initializer.")
             }
             resolve(statement.value)
         }
@@ -156,7 +156,7 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
 
         if (statement.superclass != null) {
             if (statement.superclass.name.lexeme == statement.name.lexeme) {
-                Language.error(statement.superclass.name, "A class can't inherit from itself.")
+                LRuntime.error(statement.superclass.name, "A class can't inherit from itself.")
             }
             currentClass = ClassType.SUBCLASS
             resolve(statement.superclass)
@@ -187,12 +187,12 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
 
     override fun visitSuperExpr(expr: Expr.Super) {
         if (currentClass == ClassType.NONE) {
-            Language.error(
+            LRuntime.error(
                 expr.keyword,
                 "Can't use 'super' outside of a class."
             )
         } else if (currentClass != ClassType.SUBCLASS) {
-            Language.error(
+            LRuntime.error(
                 expr.keyword,
                 "Can't use 'super' in a class with no superclass."
             )
@@ -221,7 +221,7 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
 
     override fun visitThisExpr(expr: Expr.This) {
         if (currentClass != ClassType.CLASS) {
-            Language.error(expr.keyword, "Can't use 'this' outside of class.")
+            LRuntime.error(expr.keyword, "Can't use 'this' outside of class.")
         }
         resolveLocal(expr, expr.keyword)
     }
@@ -272,7 +272,7 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
         val scope: MutableMap<String, Boolean> = scopes.peek()
         val block: MutableMap<IdentifierDefinition, Int> = identifiers.peek()
         if (scope.containsKey(name.lexeme)) {
-            Language.error(name, "Already a variable with this name in this scope")
+            LRuntime.error(name, "Already a variable with this name in this scope")
         }
 
         scope[name.lexeme] = false
@@ -307,7 +307,7 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
         val block = identifiers.peek()
         for ((definition, usage) in block) {
             if (usage == 0) {
-                Language.warn(definition.token, "Unused variable.")
+                LRuntime.warn(definition.token, "Unused variable.")
             }
         }
     }

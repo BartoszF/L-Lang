@@ -8,16 +8,14 @@ import pl.bfelis.fc93.language.scanner.Scanner
 import pl.bfelis.fc93.language.scanner.Token
 import pl.bfelis.fc93.language.scanner.TokenType
 
-class Language {
+class LRuntime {
     val interpreter = Interpreter()
     val resolver = Resolver(interpreter)
-    val printer = AstPrinter()
+    private val printer = AstPrinter()
 
     fun run(source: String) {
         val scanner = Scanner(source)
         val tokens = scanner.scanTokens()
-
-//        tokens.map { println(it.toString()) }
 
         if (hadError) return
 

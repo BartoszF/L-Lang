@@ -1,5 +1,6 @@
-package pl.bfelis.fc93.language.interpreter
+package pl.bfelis.fc93.language.interpreter.native
 
+import pl.bfelis.fc93.language.interpreter.Environment
 import pl.bfelis.fc93.language.interpreter.native.function.Clock
 import pl.bfelis.fc93.language.interpreter.native.function.ToString
 import pl.bfelis.fc93.language.interpreter.native.klass.LArray

@@ -46,7 +46,7 @@ private fun runPrompt() {
 
 private fun run(source: String) {
     try {
-        Language().run(source)
+        LRuntime().run(source)
     } catch (e: ResolverError) {
         resolverError(e)
         exitProcess(70)

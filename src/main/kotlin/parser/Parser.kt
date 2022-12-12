@@ -1,6 +1,6 @@
 package pl.bfelis.fc93.language.parser
 
-import pl.bfelis.fc93.language.Language
+import pl.bfelis.fc93.language.LRuntime
 import pl.bfelis.fc93.language.ast.Expr
 import pl.bfelis.fc93.language.ast.Expr.Assign
 import pl.bfelis.fc93.language.ast.Expr.Logical
@@ -66,7 +66,7 @@ class Parser(private val tokens: List<Token>) {
         if (!check(TokenType.RIGHT_PAREN)) {
             do {
                 if (parameters.size >= 255) {
-                    Language.error(peek(), "Can't have more than 255 parameters.")
+                    LRuntime.error(peek(), "Can't have more than 255 parameters.")
                 }
                 parameters.add(
                     consume(TokenType.IDENTIFIER, "Expect parameter name.")
@@ -95,7 +95,7 @@ class Parser(private val tokens: List<Token>) {
         if (match(TokenType.EQUAL)) {
             initializer = expression()
         } else {
-            Language.error(name, "val needs initializer.")
+            LRuntime.error(name, "val needs initializer.")
             throw ParserError(name, "val needs initializer.")
         }
 
@@ -223,7 +223,7 @@ class Parser(private val tokens: List<Token>) {
                     return Expr.AccessorSet(expr, value)
                 }
 
-                else -> Language.error(equals, "Invalid assignment target.")
+                else -> LRuntime.error(equals, "Invalid assignment target.")
             }
         }
         return expr
@@ -318,7 +318,7 @@ class Parser(private val tokens: List<Token>) {
             }
 
             else -> {
-                Language.error(operator, "Unknown assignment operator ${operator.lexeme}")
+                LRuntime.error(operator, "Unknown assignment operator ${operator.lexeme}")
                 throw ParserError(operator, "Unknown assignment operator ${operator.lexeme}")
             }
         }
@@ -375,7 +375,7 @@ class Parser(private val tokens: List<Token>) {
         if (!check(TokenType.RIGHT_PAREN)) {
             do {
                 if (arguments.size >= 255) {
-                    Language.error(peek(), "Can't have more than 255 arguments.")
+                    LRuntime.error(peek(), "Can't have more than 255 arguments.")
                 }
                 arguments.add(expression())
             } while (match(TokenType.COMMA))
@@ -393,7 +393,7 @@ class Parser(private val tokens: List<Token>) {
         if (!check(TokenType.RIGHT_PAREN)) {
             do {
                 if (parameters.size >= 255) {
-                    Language.error(peek(), "Cannot have more than 255 parameters")
+                    LRuntime.error(peek(), "Cannot have more than 255 parameters")
                 }
                 parameters.add(consume(TokenType.IDENTIFIER, "Expect parameters name."))
             } while (match(TokenType.COMMA))
@@ -431,7 +431,7 @@ class Parser(private val tokens: List<Token>) {
             return Expr.Grouping(expr)
         }
 
-        Language.error(peek(), "Expect expression.")
+        LRuntime.error(peek(), "Expect expression.")
         throw ParserError(peek(), "Expect expression.")
     }
 
@@ -449,7 +449,7 @@ class Parser(private val tokens: List<Token>) {
 
     private fun consume(type: TokenType, message: String): Token {
         if (check(type)) return advance()
-        Language.error(peek(), message)
+        LRuntime.error(peek(), message)
         throw ParserError(peek(), message)
     }
 

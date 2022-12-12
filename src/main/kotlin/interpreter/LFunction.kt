@@ -1,13 +1,12 @@
 package pl.bfelis.fc93.language.interpreter
 
 import pl.bfelis.fc93.language.ast.Statement
-import pl.bfelis.fc93.language.parser.Return
 
 class LFunction(
     private val declaration: Statement.Function,
     private val closure: Environment,
     private val isInitializer: Boolean = false,
-    public val isNative: Boolean = false
+    val isNative: Boolean = false
 ) : LCallable {
     override fun arity(): Int = declaration.params.size
 
