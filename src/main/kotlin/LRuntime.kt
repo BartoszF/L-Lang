@@ -1,33 +1,42 @@
 package pl.bfelis.fc93.language
 
 import pl.bfelis.fc93.language.ast.AstPrinter
+import pl.bfelis.fc93.language.error.*
 import pl.bfelis.fc93.language.interpreter.Interpreter
 import pl.bfelis.fc93.language.parser.Parser
 import pl.bfelis.fc93.language.resolver.Resolver
 import pl.bfelis.fc93.language.scanner.Scanner
-import pl.bfelis.fc93.language.scanner.Token
-import pl.bfelis.fc93.language.scanner.TokenType
 
-class LRuntime {
+class LRuntime(private val debug: Boolean = false) {
     val interpreter = Interpreter()
     val resolver = Resolver(interpreter)
-    private val printer = AstPrinter()
+    private val astPrinter = AstPrinter()
 
     fun run(source: String) {
         val scanner = Scanner(source)
         val tokens = scanner.scanTokens()
 
-        if (hadError) return
+        errorNotifier.register(errorPrinter)
+
+        if (hadError) {
+            errorNotifier.notifyErrors()
+        }
 
         val parser = Parser(tokens)
         val statements = parser.parse()
 
-        if (hadError) return
+        if (hadError) {
+            errorNotifier.notifyErrors()
+        }
 
-        val a = printer.printStatements(statements)
-        println(a)
+        if (debug) {
+            val ast = astPrinter.printStatements(statements)
+            println(ast)
+        }
 
         Resolver(interpreter).resolve(statements)
+
+        errorNotifier.notifyErrors() // Notify no matter what - there could be warnings
 
         if (hadError) return
 
@@ -36,35 +45,22 @@ class LRuntime {
 
     fun getEnvironment() = interpreter.globals
 
+    fun registerErrorObserver(observer: ErrorObserver) {
+        errorNotifier.register(observer)
+    }
+
     companion object {
         var hadError = false
+        private val errorNotifier = ErrorNotifier()
+        private val errorPrinter = ErrorPrinter()
 
-        fun warn(token: Token, message: String?) {
-            report(token.line, "", message ?: "")
+        fun warn(warning: Warning) {
+            errorNotifier.error(warning)
         }
 
-        fun error(line: Int, message: String?) {
-            report(line, "", message ?: "")
+        fun error(error: GeneralLException) {
+            errorNotifier.error(error)
             hadError = true
-        }
-
-        fun error(token: Token, message: String?) {
-            if (token.type == TokenType.EOF) {
-                report(token.line, " at end", message ?: "")
-            } else {
-                report(token.line, " at '${token.lexeme}'", message ?: "")
-            }
-            hadError = true
-        }
-
-        private fun report(
-            line: Int,
-            where: String,
-            message: String
-        ) {
-            System.err.println(
-                "[line $line] Error$where: $message"
-            )
         }
     }
 }

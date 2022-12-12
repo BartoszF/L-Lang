@@ -1,6 +1,7 @@
 package pl.bfelis.fc93.language.scanner
 
 import pl.bfelis.fc93.language.LRuntime
+import pl.bfelis.fc93.language.error.ScanError
 
 class Scanner(private val source: String) {
     private val tokens: MutableList<Token> = mutableListOf()
@@ -55,7 +56,7 @@ class Scanner(private val source: String) {
                 } else if (isAlpha(c)) {
                     identifier()
                 } else {
-                    LRuntime.error(line, "Unexpected character")
+                    LRuntime.error(ScanError(line, "Unexpected character $c"))
                 }
             }
         }
@@ -112,7 +113,7 @@ class Scanner(private val source: String) {
             advance()
         }
         if (isAtEnd()) {
-            LRuntime.error(line, "Unterminated string")
+            LRuntime.error(ScanError(line, "Unterminated string"))
         }
 
         // The closing ".

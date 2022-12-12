@@ -4,6 +4,8 @@ import pl.bfelis.fc93.language.LRuntime
 import pl.bfelis.fc93.language.ast.Expr
 import pl.bfelis.fc93.language.ast.Expr.Assign
 import pl.bfelis.fc93.language.ast.Statement
+import pl.bfelis.fc93.language.error.ResolverError
+import pl.bfelis.fc93.language.error.Warning
 import pl.bfelis.fc93.language.interpreter.Interpreter
 import pl.bfelis.fc93.language.scanner.Token
 import pl.bfelis.fc93.language.scanner.TokenType
@@ -41,7 +43,7 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
         if (!scopes.isEmpty() &&
             scopes.peek()[expr.name.lexeme] === java.lang.Boolean.FALSE
         ) {
-            LRuntime.error(expr.name, "Can't read local variable in its own initializer.")
+            LRuntime.error(ResolverError(expr.name, "Can't read local variable in its own initializer."))
         }
         resolveLocal(expr, expr.name)
     }
@@ -62,7 +64,7 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
             .firstNotNullOf { identifiers[it].filterKeys { k -> k.token.lexeme == expr.name.lexeme }.keys.firstOrNull() }
 
         if (key.isVal) {
-            LRuntime.error(expr.name, "val cannot be reassigned.")
+            LRuntime.error(ResolverError(expr.name, "val cannot be reassigned."))
         }
     }
 
@@ -98,11 +100,11 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
 
     override fun visitReturnStatement(statement: Statement.Return) {
         if (currentFunction != FunctionType.FUNCTION) {
-            LRuntime.error(statement.keyword, "Can't return from top-level code.")
+            LRuntime.error(ResolverError(statement.keyword, "Can't return from top-level code."))
         }
         if (statement.value != null) {
             if (currentFunction == FunctionType.INITIALIZER) {
-                LRuntime.error(statement.keyword, "Can't return a value from an initializer.")
+                LRuntime.error(ResolverError(statement.keyword, "Can't return a value from an initializer."))
             }
             resolve(statement.value)
         }
@@ -156,7 +158,7 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
 
         if (statement.superclass != null) {
             if (statement.superclass.name.lexeme == statement.name.lexeme) {
-                LRuntime.error(statement.superclass.name, "A class can't inherit from itself.")
+                LRuntime.error(ResolverError(statement.superclass.name, "A class can't inherit from itself."))
             }
             currentClass = ClassType.SUBCLASS
             resolve(statement.superclass)
@@ -188,13 +190,17 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
     override fun visitSuperExpr(expr: Expr.Super) {
         if (currentClass == ClassType.NONE) {
             LRuntime.error(
-                expr.keyword,
-                "Can't use 'super' outside of a class."
+                ResolverError(
+                    expr.keyword,
+                    "Can't use 'super' outside of a class."
+                )
             )
         } else if (currentClass != ClassType.SUBCLASS) {
             LRuntime.error(
-                expr.keyword,
-                "Can't use 'super' in a class with no superclass."
+                ResolverError(
+                    expr.keyword,
+                    "Can't use 'super' in a class with no superclass."
+                )
             )
         }
         resolveLocal(expr, expr.keyword)
@@ -221,7 +227,7 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
 
     override fun visitThisExpr(expr: Expr.This) {
         if (currentClass != ClassType.CLASS) {
-            LRuntime.error(expr.keyword, "Can't use 'this' outside of class.")
+            LRuntime.error(ResolverError(expr.keyword, "Can't use 'this' outside of class."))
         }
         resolveLocal(expr, expr.keyword)
     }
@@ -272,7 +278,7 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
         val scope: MutableMap<String, Boolean> = scopes.peek()
         val block: MutableMap<IdentifierDefinition, Int> = identifiers.peek()
         if (scope.containsKey(name.lexeme)) {
-            LRuntime.error(name, "Already a variable with this name in this scope")
+            LRuntime.error(ResolverError(name, "Already a variable with this name in this scope"))
         }
 
         scope[name.lexeme] = false
@@ -307,7 +313,7 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
         val block = identifiers.peek()
         for ((definition, usage) in block) {
             if (usage == 0) {
-                LRuntime.warn(definition.token, "Unused variable.")
+                LRuntime.warn(Warning(definition.token, "Unused variable."))
             }
         }
     }

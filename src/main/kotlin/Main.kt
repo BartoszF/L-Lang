@@ -1,7 +1,7 @@
 package pl.bfelis.fc93.language
 
+import pl.bfelis.fc93.language.error.ResolverError
 import pl.bfelis.fc93.language.interpreter.RuntimeError
-import pl.bfelis.fc93.language.resolver.ResolverError
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -59,8 +59,8 @@ private fun run(source: String) {
 fun resolverError(error: ResolverError) {
     System.err.println(
         """
-            ${error.message} {${error.name.lexeme}}
-            [line ${error.name.line}]
+            ${error.message} {${error.token?.lexeme}}
+            [line ${error.token?.line}]
         """.trimIndent()
     )
 }
