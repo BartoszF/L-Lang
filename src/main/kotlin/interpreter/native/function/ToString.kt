@@ -1,8 +1,8 @@
-package pl.bfelis.fc93.language.interpreter.native.function
+package pl.bfelis.llang.language.interpreter.native.function
 
-import pl.bfelis.fc93.language.interpreter.Interpreter
-import pl.bfelis.fc93.language.interpreter.LCallable
-import pl.bfelis.fc93.language.interpreter.Utils
+import pl.bfelis.llang.language.interpreter.Interpreter
+import pl.bfelis.llang.language.interpreter.LCallable
+import pl.bfelis.llang.language.interpreter.Utils
 
 object ToString : LCallable {
     override fun arity(): Int = 1

@@ -1,7 +1,7 @@
-package pl.bfelis.fc93.language.interpreter.native.klass
+package pl.bfelis.llang.language.interpreter.native.klass
 
-import pl.bfelis.fc93.language.interpreter.*
-import pl.bfelis.fc93.language.interpreter.native.LIterable
+import pl.bfelis.llang.language.interpreter.*
+import pl.bfelis.llang.language.interpreter.native.LIterable
 
 val ArrayMethods = { env: Environment ->
     mutableMapOf(

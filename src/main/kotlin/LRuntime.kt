@@ -1,11 +1,11 @@
-package pl.bfelis.fc93.language
+package pl.bfelis.llang.language
 
-import pl.bfelis.fc93.language.ast.AstPrinter
-import pl.bfelis.fc93.language.error.*
-import pl.bfelis.fc93.language.interpreter.Interpreter
-import pl.bfelis.fc93.language.parser.Parser
-import pl.bfelis.fc93.language.resolver.Resolver
-import pl.bfelis.fc93.language.scanner.Scanner
+import pl.bfelis.llang.language.ast.AstPrinter
+import pl.bfelis.llang.language.error.*
+import pl.bfelis.llang.language.interpreter.Interpreter
+import pl.bfelis.llang.language.parser.Parser
+import pl.bfelis.llang.language.resolver.Resolver
+import pl.bfelis.llang.language.scanner.Scanner
 
 class LRuntime(private val debug: Boolean = false) {
     val interpreter = Interpreter()
@@ -40,7 +40,7 @@ class LRuntime(private val debug: Boolean = false) {
             println(ast)
         }
 
-        Resolver(interpreter).resolve(statements)
+        resolver.resolve(statements)
 
         errorNotifier.notifyErrors() // Notify no matter what - there could be warnings
 

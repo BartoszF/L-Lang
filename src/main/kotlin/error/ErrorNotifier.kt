@@ -1,4 +1,4 @@
-package pl.bfelis.fc93.language.error
+package pl.bfelis.llang.language.error
 
 interface ErrorObserver {
     fun onErrors(errors: List<GeneralLException>)

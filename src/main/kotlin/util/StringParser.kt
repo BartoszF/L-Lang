@@ -1,8 +1,8 @@
-package pl.bfelis.fc93.language.util
+package pl.bfelis.llang.language.util
 
-import pl.bfelis.fc93.language.ast.Statement
-import pl.bfelis.fc93.language.parser.Parser
-import pl.bfelis.fc93.language.scanner.Scanner
+import pl.bfelis.llang.language.ast.Statement
+import pl.bfelis.llang.language.parser.Parser
+import pl.bfelis.llang.language.scanner.Scanner
 
 fun String.parse(): List<Statement?> {
     val scanner = Scanner(this)

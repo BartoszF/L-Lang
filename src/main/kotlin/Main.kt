@@ -1,7 +1,7 @@
-package pl.bfelis.fc93.language
+package pl.bfelis.llang.language
 
-import pl.bfelis.fc93.language.error.ResolverError
-import pl.bfelis.fc93.language.interpreter.RuntimeError
+import pl.bfelis.llang.language.error.ResolverError
+import pl.bfelis.llang.language.interpreter.RuntimeError
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader

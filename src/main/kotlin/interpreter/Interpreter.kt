@@ -1,11 +1,11 @@
-package pl.bfelis.fc93.language.interpreter
+package pl.bfelis.llang.language.interpreter
 
-import pl.bfelis.fc93.language.ast.Expr
-import pl.bfelis.fc93.language.ast.Statement
-import pl.bfelis.fc93.language.interpreter.native.Globals
-import pl.bfelis.fc93.language.interpreter.native.LIterable
-import pl.bfelis.fc93.language.scanner.Token
-import pl.bfelis.fc93.language.scanner.TokenType
+import pl.bfelis.llang.language.ast.Expr
+import pl.bfelis.llang.language.ast.Statement
+import pl.bfelis.llang.language.interpreter.native.Globals
+import pl.bfelis.llang.language.interpreter.native.LIterable
+import pl.bfelis.llang.language.scanner.Token
+import pl.bfelis.llang.language.scanner.TokenType
 
 class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
 

@@ -1,4 +1,4 @@
-package pl.bfelis.fc93.language.interpreter
+package pl.bfelis.llang.language.interpreter
 
 interface LCallable {
     fun arity(): Int

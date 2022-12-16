@@ -1,6 +1,6 @@
-package pl.bfelis.fc93.language.interpreter
+package pl.bfelis.llang.language.interpreter
 
-import pl.bfelis.fc93.language.ast.Statement
+import pl.bfelis.llang.language.ast.Statement
 
 class LFunction(
     private val declaration: Statement.Function,

@@ -1,13 +1,13 @@
-package pl.bfelis.fc93.language.parser
+package pl.bfelis.llang.language.parser
 
-import pl.bfelis.fc93.language.LRuntime
-import pl.bfelis.fc93.language.ast.Expr
-import pl.bfelis.fc93.language.ast.Expr.Assign
-import pl.bfelis.fc93.language.ast.Expr.Logical
-import pl.bfelis.fc93.language.ast.Statement
-import pl.bfelis.fc93.language.error.ParserError
-import pl.bfelis.fc93.language.scanner.Token
-import pl.bfelis.fc93.language.scanner.TokenType
+import pl.bfelis.llang.language.LRuntime
+import pl.bfelis.llang.language.ast.Expr
+import pl.bfelis.llang.language.ast.Expr.Assign
+import pl.bfelis.llang.language.ast.Expr.Logical
+import pl.bfelis.llang.language.ast.Statement
+import pl.bfelis.llang.language.error.ParserError
+import pl.bfelis.llang.language.scanner.Token
+import pl.bfelis.llang.language.scanner.TokenType
 
 class Parser(private val tokens: List<Token>) {
     private var current = 0

@@ -1,4 +1,4 @@
-package pl.bfelis.fc93.language.resolver
+package pl.bfelis.llang.language.resolver
 
 enum class FunctionType {
     NONE, FUNCTION, INITIALIZER, METHOD

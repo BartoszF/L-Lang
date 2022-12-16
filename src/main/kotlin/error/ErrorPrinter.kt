@@ -1,6 +1,6 @@
-package pl.bfelis.fc93.language.error
+package pl.bfelis.llang.language.error
 
-import pl.bfelis.fc93.language.scanner.TokenType
+import pl.bfelis.llang.language.scanner.TokenType
 
 class ErrorPrinter : ErrorObserver {
     override fun onErrors(errors: List<GeneralLException>) {

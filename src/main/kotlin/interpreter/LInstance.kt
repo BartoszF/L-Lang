@@ -1,6 +1,6 @@
-package pl.bfelis.fc93.language.interpreter
+package pl.bfelis.llang.language.interpreter
 
-import pl.bfelis.fc93.language.scanner.Token
+import pl.bfelis.llang.language.scanner.Token
 
 open class LInstance(val klass: LClass, val fields: MutableMap<String, Any?> = mutableMapOf()) {
 

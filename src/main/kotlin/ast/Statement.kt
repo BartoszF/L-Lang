@@ -1,6 +1,6 @@
-package pl.bfelis.fc93.language.ast
+package pl.bfelis.llang.language.ast
 
-import pl.bfelis.fc93.language.scanner.Token
+import pl.bfelis.llang.language.scanner.Token
 
 abstract class Statement {
     interface Visitor<R> {

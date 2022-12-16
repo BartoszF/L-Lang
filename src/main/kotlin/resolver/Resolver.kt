@@ -1,14 +1,14 @@
-package pl.bfelis.fc93.language.resolver
+package pl.bfelis.llang.language.resolver
 
-import pl.bfelis.fc93.language.LRuntime
-import pl.bfelis.fc93.language.ast.Expr
-import pl.bfelis.fc93.language.ast.Expr.Assign
-import pl.bfelis.fc93.language.ast.Statement
-import pl.bfelis.fc93.language.error.ResolverError
-import pl.bfelis.fc93.language.error.Warning
-import pl.bfelis.fc93.language.interpreter.Interpreter
-import pl.bfelis.fc93.language.scanner.Token
-import pl.bfelis.fc93.language.scanner.TokenType
+import pl.bfelis.llang.language.LRuntime
+import pl.bfelis.llang.language.ast.Expr
+import pl.bfelis.llang.language.ast.Expr.Assign
+import pl.bfelis.llang.language.ast.Statement
+import pl.bfelis.llang.language.error.ResolverError
+import pl.bfelis.llang.language.error.Warning
+import pl.bfelis.llang.language.interpreter.Interpreter
+import pl.bfelis.llang.language.scanner.Token
+import pl.bfelis.llang.language.scanner.TokenType
 import java.util.*
 
 data class IdentifierDefinition(val token: Token, val isVal: Boolean = false)

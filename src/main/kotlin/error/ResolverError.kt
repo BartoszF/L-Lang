@@ -1,5 +1,5 @@
-package pl.bfelis.fc93.language.error
+package pl.bfelis.llang.language.error
 
-import pl.bfelis.fc93.language.scanner.Token
+import pl.bfelis.llang.language.scanner.Token
 
 class ResolverError(token: Token, message: String? = null) : GeneralLException(token.line, token, message)

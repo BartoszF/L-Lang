@@ -1,7 +1,7 @@
-package pl.bfelis.fc93.language.scanner
+package pl.bfelis.llang.language.scanner
 
-import pl.bfelis.fc93.language.LRuntime
-import pl.bfelis.fc93.language.error.ScanError
+import pl.bfelis.llang.language.LRuntime
+import pl.bfelis.llang.language.error.ScanError
 
 class Scanner(private val source: String) {
     private val tokens: MutableList<Token> = mutableListOf()

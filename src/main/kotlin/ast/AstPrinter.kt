@@ -1,4 +1,4 @@
-package pl.bfelis.fc93.language.ast
+package pl.bfelis.llang.language.ast
 
 class AstPrinter : Expr.Visitor<String>, Statement.Visitor<String> {
 

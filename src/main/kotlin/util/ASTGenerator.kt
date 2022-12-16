@@ -1,4 +1,4 @@
-package pl.bfelis.fc93.language.util
+package pl.bfelis.llang.language.util
 
 import java.io.IOException
 import java.io.PrintWriter
@@ -29,9 +29,9 @@ class ASTGenerator {
         ) {
             val path = "$outputDir/$baseName.kt"
             val writer = PrintWriter(path, "UTF-8")
-            writer.println("package pl.bfelis.fc93.language.ast")
+            writer.println("package pl.bfelis.llang.language.ast")
             writer.println()
-            writer.println("import pl.bfelis.fc93.language.scanner.Token")
+            writer.println("import pl.bfelis.llang.language.scanner.Token")
             writer.println()
             writer.println("abstract class $baseName {")
 

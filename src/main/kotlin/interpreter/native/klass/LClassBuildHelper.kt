@@ -1,10 +1,10 @@
-package pl.bfelis.fc93.language.interpreter.native.klass
+package pl.bfelis.llang.language.interpreter.native.klass
 
-import pl.bfelis.fc93.language.ast.Statement
-import pl.bfelis.fc93.language.interpreter.Environment
-import pl.bfelis.fc93.language.interpreter.LFunction
-import pl.bfelis.fc93.language.scanner.Token
-import pl.bfelis.fc93.language.scanner.TokenType
+import pl.bfelis.llang.language.ast.Statement
+import pl.bfelis.llang.language.interpreter.Environment
+import pl.bfelis.llang.language.interpreter.LFunction
+import pl.bfelis.llang.language.scanner.Token
+import pl.bfelis.llang.language.scanner.TokenType
 
 fun getNativeMethodForLClass(name: String, params: List<String>, isInit: Boolean, env: Environment): LFunction {
     return LFunction(

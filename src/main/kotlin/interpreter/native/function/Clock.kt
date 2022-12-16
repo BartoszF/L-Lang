@@ -1,7 +1,7 @@
-package pl.bfelis.fc93.language.interpreter.native.function
+package pl.bfelis.llang.language.interpreter.native.function
 
-import pl.bfelis.fc93.language.interpreter.Interpreter
-import pl.bfelis.fc93.language.interpreter.LCallable
+import pl.bfelis.llang.language.interpreter.Interpreter
+import pl.bfelis.llang.language.interpreter.LCallable
 
 object Clock : LCallable {
     override fun arity(): Int = 0

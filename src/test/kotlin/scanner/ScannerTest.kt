@@ -2,8 +2,8 @@ package scanner
 
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
-import pl.bfelis.fc93.language.scanner.Scanner
-import pl.bfelis.fc93.language.scanner.TokenType
+import pl.bfelis.llang.language.scanner.Scanner
+import pl.bfelis.llang.language.scanner.TokenType
 
 private fun sourceShouldScanTo(source: String, tokenType: TokenType, lexeme: String? = null, literal: Any? = null) {
     val scanner = Scanner(source)

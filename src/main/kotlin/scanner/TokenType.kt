@@ -1,4 +1,4 @@
-package pl.bfelis.fc93.language.scanner
+package pl.bfelis.llang.language.scanner
 
 enum class TokenType {
     // Single-character tokens.

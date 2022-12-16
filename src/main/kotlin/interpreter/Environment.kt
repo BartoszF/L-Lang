@@ -1,6 +1,6 @@
-package pl.bfelis.fc93.language.interpreter
+package pl.bfelis.llang.language.interpreter
 
-import pl.bfelis.fc93.language.scanner.Token
+import pl.bfelis.llang.language.scanner.Token
 
 data class Environment(val enclosing: Environment? = null, val values: MutableMap<String, Any?> = mutableMapOf()) {
     fun define(name: String, value: Any?) {
