@@ -3,7 +3,7 @@ package pl.bfelis.llang.language.scanner
 import pl.bfelis.llang.language.LRuntime
 import pl.bfelis.llang.language.error.ScanError
 
-class Scanner(private val source: String) {
+class Scanner(private val source: String, fileName: String? = null) {
     private val tokens: MutableList<Token> = mutableListOf()
     private var start = 0
     private var current = 0
@@ -165,6 +165,7 @@ class Scanner(private val source: String) {
             keywords["var"] = TokenType.VAR
             keywords["val"] = TokenType.VAL
             keywords["while"] = TokenType.WHILE
+            keywords["import"] = TokenType.IMPORT
         }
     }
 }

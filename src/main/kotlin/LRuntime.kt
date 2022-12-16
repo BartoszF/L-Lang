@@ -6,28 +6,39 @@ import pl.bfelis.llang.language.interpreter.Interpreter
 import pl.bfelis.llang.language.parser.Parser
 import pl.bfelis.llang.language.resolver.Resolver
 import pl.bfelis.llang.language.scanner.Scanner
+import java.io.File
+import java.nio.charset.Charset
 
 class LRuntime(private val debug: Boolean = false) {
     val interpreter = Interpreter()
-    val resolver = Resolver(interpreter)
+    private val resolver = Resolver(interpreter, this)
     private val astPrinter = AstPrinter()
 
-    fun run(source: String) {
-        val scanner = Scanner(source)
+    init {
+        errorNotifier.register(errorPrinter)
+    }
+
+    fun run(file: File, nested: Boolean = false) {
+        run(String(file.readBytes(), Charset.defaultCharset()), file.path, nested)
+    }
+
+    fun run(source: String, fileName: String? = null, nested: Boolean = false) {
+        val scanner = Scanner(source, fileName)
         val tokens = scanner.scanTokens()
 
         if (debug) {
+            println("FILE: $fileName")
+            println("## Scanned tokens ##")
             tokens.forEach { println(it) }
+            println()
         }
-
-        errorNotifier.register(errorPrinter)
 
         if (hadError) {
             errorNotifier.notifyErrors()
             return
         }
 
-        val parser = Parser(tokens)
+        val parser = Parser(tokens, fileName)
         val statements = parser.parse()
 
         if (hadError) {
@@ -36,17 +47,21 @@ class LRuntime(private val debug: Boolean = false) {
         }
 
         if (debug) {
+            println("## AST ##")
             val ast = astPrinter.printStatements(statements)
             println(ast)
+            println()
         }
 
-        resolver.resolve(statements)
+        resolver.resolve(statements, fileName = fileName)
 
-        errorNotifier.notifyErrors() // Notify no matter what - there could be warnings
+        if (!nested) {
+            errorNotifier.notifyErrors() // Notify no matter what - there could be warnings
+        }
 
         if (hadError) return
 
-        interpreter.interpret(statements)
+        interpreter.interpret(statements, fileName)
     }
 
     fun getEnvironment() = interpreter.globals

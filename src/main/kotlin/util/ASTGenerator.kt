@@ -44,7 +44,7 @@ class ASTGenerator {
             }
 
             writer.println()
-            writer.println("  abstract fun <R> accept(visitor: Visitor<R>) : R")
+            writer.println("  abstract fun <R> accept(visitor: Visitor<R>, fileName: String? = null) : R")
 
             writer.println("}")
             writer.close()
@@ -69,8 +69,8 @@ class ASTGenerator {
             writer.println(") : $baseName() {")
 
             writer.println()
-            writer.println("    override fun <R> accept(visitor: Visitor<R>): R {")
-            writer.println("        return visitor.visit$className$baseName(this)")
+            writer.println("    override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {")
+            writer.println("        return visitor.visit$className$baseName(this, fileName)")
             writer.println("    }")
             writer.println("  }")
         }
@@ -84,7 +84,7 @@ class ASTGenerator {
             for (type: String in types) {
                 val typeName = type.split(":".toRegex()).toTypedArray()[0].trim { it <= ' ' }
                 writer.println(
-                    "    fun visit$typeName$baseName(${baseName.lowercase(Locale.getDefault())} : $typeName): R"
+                    "    fun visit$typeName$baseName(${baseName.lowercase(Locale.getDefault())} : $typeName, fileName: String? = null): R"
                 )
             }
             writer.println("  }")

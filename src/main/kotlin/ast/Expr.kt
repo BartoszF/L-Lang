@@ -4,25 +4,25 @@ import pl.bfelis.llang.language.scanner.Token
 
 abstract class Expr {
     interface Visitor<R> {
-        fun visitAssignExpr(expr: Assign): R
-        fun visitAssignIncrementExpr(expr: AssignIncrement): R
-        fun visitAssignDecrementExpr(expr: AssignDecrement): R
-        fun visitBinaryExpr(expr: Binary): R
-        fun visitCallExpr(expr: Call): R
-        fun visitGetExpr(expr: Get): R
-        fun visitSetExpr(expr: Set): R
-        fun visitSuperExpr(expr: Super): R
-        fun visitAccessorExpr(expr: Accessor): R
-        fun visitAccessorSetExpr(expr: AccessorSet): R
-        fun visitThisExpr(expr: This): R
-        fun visitGroupingExpr(expr: Grouping): R
-        fun visitLiteralExpr(expr: Literal): R
-        fun visitLogicalExpr(expr: Logical): R
-        fun visitLambdaExpr(expr: Lambda): R
-        fun visitUnaryExpr(expr: Unary): R
-        fun visitVariableExpr(expr: Variable): R
-        fun visitIncrementExpr(expr: Increment): R
-        fun visitDecrementExpr(expr: Decrement): R
+        fun visitAssignExpr(expr: Assign, fileName: String? = null): R
+        fun visitAssignIncrementExpr(expr: AssignIncrement, fileName: String? = null): R
+        fun visitAssignDecrementExpr(expr: AssignDecrement, fileName: String? = null): R
+        fun visitBinaryExpr(expr: Binary, fileName: String? = null): R
+        fun visitCallExpr(expr: Call, fileName: String? = null): R
+        fun visitGetExpr(expr: Get, fileName: String? = null): R
+        fun visitSetExpr(expr: Set, fileName: String? = null): R
+        fun visitSuperExpr(expr: Super, fileName: String? = null): R
+        fun visitAccessorExpr(expr: Accessor, fileName: String? = null): R
+        fun visitAccessorSetExpr(expr: AccessorSet, fileName: String? = null): R
+        fun visitThisExpr(expr: This, fileName: String? = null): R
+        fun visitGroupingExpr(expr: Grouping, fileName: String? = null): R
+        fun visitLiteralExpr(expr: Literal, fileName: String? = null): R
+        fun visitLogicalExpr(expr: Logical, fileName: String? = null): R
+        fun visitLambdaExpr(expr: Lambda, fileName: String? = null): R
+        fun visitUnaryExpr(expr: Unary, fileName: String? = null): R
+        fun visitVariableExpr(expr: Variable, fileName: String? = null): R
+        fun visitIncrementExpr(expr: Increment, fileName: String? = null): R
+        fun visitDecrementExpr(expr: Decrement, fileName: String? = null): R
     }
 
     class Assign(
@@ -30,8 +30,8 @@ abstract class Expr {
         val value: Expr
     ) : Expr() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitAssignExpr(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitAssignExpr(this, fileName)
         }
     }
 
@@ -40,8 +40,8 @@ abstract class Expr {
         val value: Expr
     ) : Expr() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitAssignIncrementExpr(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitAssignIncrementExpr(this, fileName)
         }
     }
 
@@ -50,8 +50,8 @@ abstract class Expr {
         val value: Expr
     ) : Expr() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitAssignDecrementExpr(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitAssignDecrementExpr(this, fileName)
         }
     }
 
@@ -61,8 +61,8 @@ abstract class Expr {
         val right: Expr
     ) : Expr() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitBinaryExpr(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitBinaryExpr(this, fileName)
         }
     }
 
@@ -72,8 +72,8 @@ abstract class Expr {
         val arguments: List<Expr>
     ) : Expr() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitCallExpr(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitCallExpr(this, fileName)
         }
     }
 
@@ -82,8 +82,8 @@ abstract class Expr {
         val name: Token
     ) : Expr() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitGetExpr(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitGetExpr(this, fileName)
         }
     }
 
@@ -93,8 +93,8 @@ abstract class Expr {
         val value: Expr
     ) : Expr() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitSetExpr(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitSetExpr(this, fileName)
         }
     }
 
@@ -103,8 +103,8 @@ abstract class Expr {
         val method: Token
     ) : Expr() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitSuperExpr(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitSuperExpr(this, fileName)
         }
     }
 
@@ -114,8 +114,8 @@ abstract class Expr {
         val accessorToken: Token
     ) : Expr() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitAccessorExpr(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitAccessorExpr(this, fileName)
         }
     }
 
@@ -124,8 +124,8 @@ abstract class Expr {
         val value: Expr
     ) : Expr() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitAccessorSetExpr(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitAccessorSetExpr(this, fileName)
         }
     }
 
@@ -133,8 +133,8 @@ abstract class Expr {
         val keyword: Token
     ) : Expr() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitThisExpr(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitThisExpr(this, fileName)
         }
     }
 
@@ -142,8 +142,8 @@ abstract class Expr {
         val expression: Expr
     ) : Expr() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitGroupingExpr(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitGroupingExpr(this, fileName)
         }
     }
 
@@ -151,8 +151,8 @@ abstract class Expr {
         val value: Any?
     ) : Expr() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitLiteralExpr(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitLiteralExpr(this, fileName)
         }
     }
 
@@ -162,8 +162,8 @@ abstract class Expr {
         val right: Expr
     ) : Expr() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitLogicalExpr(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitLogicalExpr(this, fileName)
         }
     }
 
@@ -173,8 +173,8 @@ abstract class Expr {
         val body: List<Statement?>
     ) : Expr() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitLambdaExpr(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitLambdaExpr(this, fileName)
         }
     }
 
@@ -183,8 +183,8 @@ abstract class Expr {
         val right: Expr
     ) : Expr() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitUnaryExpr(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitUnaryExpr(this, fileName)
         }
     }
 
@@ -192,8 +192,8 @@ abstract class Expr {
         val name: Token
     ) : Expr() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitVariableExpr(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitVariableExpr(this, fileName)
         }
     }
 
@@ -201,8 +201,8 @@ abstract class Expr {
         val name: Token
     ) : Expr() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitIncrementExpr(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitIncrementExpr(this, fileName)
         }
     }
 
@@ -210,10 +210,10 @@ abstract class Expr {
         val name: Token
     ) : Expr() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitDecrementExpr(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitDecrementExpr(this, fileName)
         }
     }
 
-    abstract fun <R> accept(visitor: Visitor<R>): R
+    abstract fun <R> accept(visitor: Visitor<R>, fileName: String? = null): R
 }
