@@ -128,7 +128,7 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
     }
 
     override fun visitReturnStatement(statement: Statement.Return, fileName: String?) {
-        if (currentFunction != FunctionType.FUNCTION) {
+        if (!arrayOf(FunctionType.FUNCTION, FunctionType.METHOD).contains(currentFunction)) {
             LRuntime.error(ResolverError(statement.keyword, "Can't return from top-level code.", fileName))
         }
         if (statement.value != null) {
