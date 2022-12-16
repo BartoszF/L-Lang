@@ -19,7 +19,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         }
     }
 
-    fun interpret(statements: List<Statement?>) {
+    fun interpret(statements: List<Statement?>, fileName: String?) {
         try {
             statements.forEach { it?.let { statement -> execute(statement) } }
         } catch (error: RuntimeError) {
@@ -27,7 +27,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         }
     }
 
-    override fun visitBinaryExpr(expr: Expr.Binary): Any {
+    override fun visitBinaryExpr(expr: Expr.Binary, fileName: String?): Any {
         val left = evaluate(expr.left)
         val right = evaluate(expr.right)
 
@@ -86,15 +86,15 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         }
     }
 
-    override fun visitGroupingExpr(expr: Expr.Grouping): Any? {
+    override fun visitGroupingExpr(expr: Expr.Grouping, fileName: String?): Any? {
         return evaluate(expr.expression)
     }
 
-    override fun visitLiteralExpr(expr: Expr.Literal): Any? {
+    override fun visitLiteralExpr(expr: Expr.Literal, fileName: String?): Any? {
         return expr.value
     }
 
-    override fun visitUnaryExpr(expr: Expr.Unary): Any {
+    override fun visitUnaryExpr(expr: Expr.Unary, fileName: String?): Any {
         val right = evaluate(expr.right)
 
         return when (expr.operator.type) {
@@ -110,20 +110,20 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         }
     }
 
-    override fun visitExpressionStatement(statement: Statement.Expression) {
+    override fun visitExpressionStatement(statement: Statement.Expression, fileName: String?) {
         evaluate(statement.expression)
     }
 
-    override fun visitPrintStatement(statement: Statement.Print) {
+    override fun visitPrintStatement(statement: Statement.Print, fileName: String?) {
         val value = evaluate(statement.expression)
         println(Utils.stringify(value))
     }
 
-    override fun visitVariableExpr(expr: Expr.Variable): Any? {
+    override fun visitVariableExpr(expr: Expr.Variable, fileName: String?): Any? {
         return lookupVariable(expr.name, expr)
     }
 
-    override fun visitIncrementExpr(expr: Expr.Increment): Any {
+    override fun visitIncrementExpr(expr: Expr.Increment, fileName: String?): Any {
         val value = lookupVariable(expr.name, expr)
 
         if (value !is Double) throw RuntimeError(expr.name, "Only numbers can be incremented")
@@ -138,7 +138,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         return value
     }
 
-    override fun visitDecrementExpr(expr: Expr.Decrement): Any {
+    override fun visitDecrementExpr(expr: Expr.Decrement, fileName: String?): Any {
         val value = lookupVariable(expr.name, expr)
 
         if (value !is Double) throw RuntimeError(expr.name, "Only numbers can be decremented")
@@ -153,7 +153,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         return value
     }
 
-    override fun visitVarStatement(statement: Statement.Var) {
+    override fun visitVarStatement(statement: Statement.Var, fileName: String?) {
         var value: Any? = null
         if (statement.initializer != null) {
             value = evaluate(statement.initializer)
@@ -162,7 +162,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         environment.define(statement.name.lexeme, value)
     }
 
-    override fun visitValStatement(statement: Statement.Val) {
+    override fun visitValStatement(statement: Statement.Val, fileName: String?) {
         var value: Any? = null
         if (statement.initializer != null) {
             value = evaluate(statement.initializer)
@@ -171,7 +171,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         environment.define(statement.name.lexeme, value)
     }
 
-    override fun visitAssignExpr(expr: Expr.Assign): Any? {
+    override fun visitAssignExpr(expr: Expr.Assign, fileName: String?): Any? {
         val value = evaluate(expr.value)
 
         val distance = locals[expr]
@@ -184,7 +184,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         return value
     }
 
-    override fun visitAssignIncrementExpr(expr: Expr.AssignIncrement): Any {
+    override fun visitAssignIncrementExpr(expr: Expr.AssignIncrement, fileName: String?): Any {
         val value = evaluate(expr.value)
         val currentValue = lookupVariable(expr.name, expr)
 
@@ -201,7 +201,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         return currentValue + value
     }
 
-    override fun visitAssignDecrementExpr(expr: Expr.AssignDecrement): Any {
+    override fun visitAssignDecrementExpr(expr: Expr.AssignDecrement, fileName: String?): Any {
         val value = evaluate(expr.value)
         val currentValue = lookupVariable(expr.name, expr)
 
@@ -218,11 +218,11 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         return currentValue - value
     }
 
-    override fun visitBlockStatement(statement: Statement.Block) {
+    override fun visitBlockStatement(statement: Statement.Block, fileName: String?) {
         executeBlock(statement.statements, Environment(environment))
     }
 
-    override fun visitIfStatement(statement: Statement.If) {
+    override fun visitIfStatement(statement: Statement.If, fileName: String?) {
         if (Utils.isTruthy(evaluate(statement.condition))) {
             execute(statement.thenBranch)
         } else if (statement.elseBranch != null) {
@@ -230,7 +230,11 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         }
     }
 
-    override fun visitLogicalExpr(expr: Expr.Logical): Any? {
+    override fun visitImportStatement(statement: Statement.Import, fileName: String?) {
+        // Nothing to do here - everything is done in resolver.
+    }
+
+    override fun visitLogicalExpr(expr: Expr.Logical, fileName: String?): Any? {
         val left = evaluate(expr.left)
 
         if (expr.operator.type === TokenType.OR) {
@@ -242,19 +246,19 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         return evaluate(expr.right)
     }
 
-    override fun visitLambdaExpr(expr: Expr.Lambda): Any {
+    override fun visitLambdaExpr(expr: Expr.Lambda, fileName: String?): Any {
         val func = Statement.Function(Token(TokenType.IDENTIFIER, "Lambda", null, expr.line), expr.params, expr.body)
 
         return LFunction(func, environment, false)
     }
 
-    override fun visitWhileStatement(statement: Statement.While) {
+    override fun visitWhileStatement(statement: Statement.While, fileName: String?) {
         while (Utils.isTruthy(evaluate(statement.condition))) {
             execute(statement.body)
         }
     }
 
-    override fun visitCallExpr(expr: Expr.Call): Any? {
+    override fun visitCallExpr(expr: Expr.Call, fileName: String?): Any? {
         val callee = evaluate(expr.callee)
 
         val arguments: MutableList<Any?> = ArrayList()
@@ -280,19 +284,19 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         return function.call(this, arguments)
     }
 
-    override fun visitFunctionStatement(statement: Statement.Function) {
+    override fun visitFunctionStatement(statement: Statement.Function, fileName: String?) {
         val function = LFunction(statement, environment)
         environment.define(statement.name.lexeme, function)
     }
 
-    override fun visitReturnStatement(statement: Statement.Return) {
+    override fun visitReturnStatement(statement: Statement.Return, fileName: String?) {
         var value: Any? = null
         if (statement.value != null) value = evaluate(statement.value)
 
         throw Return(value)
     }
 
-    override fun visitClassStatement(statement: Statement.Class) {
+    override fun visitClassStatement(statement: Statement.Class, fileName: String?) {
         var superClass: Any? = null
         if (statement.superclass != null) {
             superClass = evaluate(statement.superclass)
@@ -321,7 +325,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         environment.assign(statement.name, klass)
     }
 
-    override fun visitGetExpr(expr: Expr.Get): Any? {
+    override fun visitGetExpr(expr: Expr.Get, fileName: String?): Any? {
         val obj = evaluate(expr.obj)
         if (obj is LInstance) {
             return obj[expr.name]
@@ -334,7 +338,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         )
     }
 
-    override fun visitSetExpr(expr: Expr.Set): Any? {
+    override fun visitSetExpr(expr: Expr.Set, fileName: String?): Any? {
         val obj = evaluate(expr.obj) as? LInstance ?: throw RuntimeError(
             expr.name,
             "Only instances have fields."
@@ -345,7 +349,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         return value
     }
 
-    override fun visitSuperExpr(expr: Expr.Super): Any {
+    override fun visitSuperExpr(expr: Expr.Super, fileName: String?): Any {
         val distance = locals[expr]!!
         val superclass = environment.getAt(
             distance,
@@ -360,7 +364,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         return method.bind(obj)
     }
 
-    override fun visitAccessorExpr(expr: Expr.Accessor): Any? {
+    override fun visitAccessorExpr(expr: Expr.Accessor, fileName: String?): Any? {
         val variable = evaluate(expr.obj)
         val accessor = try {
             (evaluate(expr.accessor) as Double)
@@ -387,7 +391,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         throw RuntimeError(expr.accessorToken, "Variable is not iterable.")
     }
 
-    override fun visitAccessorSetExpr(expr: Expr.AccessorSet): Any? {
+    override fun visitAccessorSetExpr(expr: Expr.AccessorSet, fileName: String?): Any? {
         val variable = evaluate(expr.accessor.obj)
         val accessor = try {
             (evaluate(expr.accessor.accessor) as Double)
@@ -424,7 +428,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         throw RuntimeError(expr.accessor.accessorToken, "Variable is not iterable.")
     }
 
-    override fun visitThisExpr(expr: Expr.This): Any? {
+    override fun visitThisExpr(expr: Expr.This, fileName: String?): Any? {
         return lookupVariable(expr.keyword, expr)
     }
 

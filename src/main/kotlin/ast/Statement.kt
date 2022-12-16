@@ -4,24 +4,25 @@ import pl.bfelis.llang.language.scanner.Token
 
 abstract class Statement {
     interface Visitor<R> {
-        fun visitBlockStatement(statement: Block): R
-        fun visitClassStatement(statement: Class): R
-        fun visitExpressionStatement(statement: Expression): R
-        fun visitFunctionStatement(statement: Function): R
-        fun visitIfStatement(statement: If): R
-        fun visitPrintStatement(statement: Print): R
-        fun visitReturnStatement(statement: Return): R
-        fun visitVarStatement(statement: Var): R
-        fun visitValStatement(statement: Val): R
-        fun visitWhileStatement(statement: While): R
+        fun visitBlockStatement(statement: Block, fileName: String? = null): R
+        fun visitClassStatement(statement: Class, fileName: String? = null): R
+        fun visitExpressionStatement(statement: Expression, fileName: String? = null): R
+        fun visitFunctionStatement(statement: Function, fileName: String? = null): R
+        fun visitIfStatement(statement: If, fileName: String? = null): R
+        fun visitImportStatement(statement: Import, fileName: String? = null): R
+        fun visitPrintStatement(statement: Print, fileName: String? = null): R
+        fun visitReturnStatement(statement: Return, fileName: String? = null): R
+        fun visitVarStatement(statement: Var, fileName: String? = null): R
+        fun visitValStatement(statement: Val, fileName: String? = null): R
+        fun visitWhileStatement(statement: While, fileName: String? = null): R
     }
 
     class Block(
         val statements: List<Statement?>
     ) : Statement() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitBlockStatement(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitBlockStatement(this, fileName)
         }
     }
 
@@ -31,8 +32,8 @@ abstract class Statement {
         val methods: List<Statement.Function>
     ) : Statement() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitClassStatement(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitClassStatement(this, fileName)
         }
     }
 
@@ -40,8 +41,8 @@ abstract class Statement {
         val expression: Expr
     ) : Statement() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitExpressionStatement(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitExpressionStatement(this, fileName)
         }
     }
 
@@ -51,8 +52,8 @@ abstract class Statement {
         val body: List<Statement?>
     ) : Statement() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitFunctionStatement(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitFunctionStatement(this, fileName)
         }
     }
 
@@ -62,8 +63,17 @@ abstract class Statement {
         val elseBranch: Statement?
     ) : Statement() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitIfStatement(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitIfStatement(this, fileName)
+        }
+    }
+
+    class Import(
+        val name: Token
+    ) : Statement() {
+
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitImportStatement(this, fileName)
         }
     }
 
@@ -71,8 +81,8 @@ abstract class Statement {
         val expression: Expr
     ) : Statement() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitPrintStatement(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitPrintStatement(this, fileName)
         }
     }
 
@@ -81,8 +91,8 @@ abstract class Statement {
         val value: Expr?
     ) : Statement() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitReturnStatement(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitReturnStatement(this, fileName)
         }
     }
 
@@ -91,8 +101,8 @@ abstract class Statement {
         val initializer: Expr?
     ) : Statement() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitVarStatement(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitVarStatement(this, fileName)
         }
     }
 
@@ -101,8 +111,8 @@ abstract class Statement {
         val initializer: Expr?
     ) : Statement() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitValStatement(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitValStatement(this, fileName)
         }
     }
 
@@ -111,10 +121,10 @@ abstract class Statement {
         val body: Statement
     ) : Statement() {
 
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitWhileStatement(this)
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitWhileStatement(this, fileName)
         }
     }
 
-    abstract fun <R> accept(visitor: Visitor<R>): R
+    abstract fun <R> accept(visitor: Visitor<R>, fileName: String? = null): R
 }

@@ -1,3 +1,3 @@
 package pl.bfelis.llang.language.error
 
-class ScanError(line: Int, message: String, throwable: Throwable? = null) : GeneralLException(line, null, message, throwable)
+class ScanError(line: Int, message: String, throwable: Throwable? = null) : GeneralLException(line, null, message, null, throwable)

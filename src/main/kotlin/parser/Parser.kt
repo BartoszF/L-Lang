@@ -9,7 +9,7 @@ import pl.bfelis.llang.language.error.ParserError
 import pl.bfelis.llang.language.scanner.Token
 import pl.bfelis.llang.language.scanner.TokenType
 
-class Parser(private val tokens: List<Token>) {
+class Parser(private val tokens: List<Token>, val fileName: String?) {
     private var current = 0
 
     fun parse(): List<Statement?> {
@@ -68,7 +68,7 @@ class Parser(private val tokens: List<Token>) {
         if (!check(TokenType.RIGHT_PAREN)) {
             do {
                 if (parameters.size >= 255) {
-                    LRuntime.error(ParserError(peek(), "Can't have more than 255 parameters."))
+                    LRuntime.error(ParserError(peek(), "Can't have more than 255 parameters.", fileName))
                 }
                 parameters.add(
                     consume(TokenType.IDENTIFIER, "Expect parameter name.")
@@ -97,7 +97,7 @@ class Parser(private val tokens: List<Token>) {
         if (match(TokenType.EQUAL)) {
             initializer = expression()
         } else {
-            throw ParserError(name, "val needs initializer.")
+            throw ParserError(name, "val needs initializer.", fileName)
         }
 
         return Statement.Val(name, initializer)
@@ -109,6 +109,7 @@ class Parser(private val tokens: List<Token>) {
         if (match(TokenType.PRINT)) return printStatement()
         if (match(TokenType.RETURN)) return returnStatement()
         if (match(TokenType.WHILE)) return whileStatement()
+        if (match(TokenType.IMPORT)) return importStatement()
         if (match(TokenType.LEFT_BRACE)) return Statement.Block(block())
 
         return expressionStatement()
@@ -189,6 +190,13 @@ class Parser(private val tokens: List<Token>) {
         return Statement.While(condition, body)
     }
 
+    private fun importStatement(): Statement {
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'import'.")
+        val name = consume(TokenType.STRING, "Expect script name.")
+        consume(TokenType.RIGHT_PAREN, "Expect ')' after script name.")
+        return Statement.Import(name)
+    }
+
     private fun block(): List<Statement?> {
         val statements: MutableList<Statement?> = mutableListOf()
         while (!check(TokenType.RIGHT_BRACE) && !isAtEnd()) {
@@ -224,7 +232,7 @@ class Parser(private val tokens: List<Token>) {
                     return Expr.AccessorSet(expr, value)
                 }
 
-                else -> LRuntime.error(ParserError(equals, "Invalid assignment target."))
+                else -> LRuntime.error(ParserError(equals, "Invalid assignment target.", fileName))
             }
         }
         return expr
@@ -319,7 +327,7 @@ class Parser(private val tokens: List<Token>) {
             }
 
             else -> {
-                throw ParserError(operator, "Unknown assignment operator ${operator.lexeme}")
+                throw ParserError(operator, "Unknown assignment operator ${operator.lexeme}", fileName)
             }
         }
     }
@@ -375,7 +383,7 @@ class Parser(private val tokens: List<Token>) {
         if (!check(TokenType.RIGHT_PAREN)) {
             do {
                 if (arguments.size >= 255) {
-                    LRuntime.error(ParserError(peek(), "Can't have more than 255 arguments."))
+                    LRuntime.error(ParserError(peek(), "Can't have more than 255 arguments.", fileName))
                 }
                 arguments.add(expression())
             } while (match(TokenType.COMMA))
@@ -393,7 +401,7 @@ class Parser(private val tokens: List<Token>) {
         if (!check(TokenType.RIGHT_PAREN)) {
             do {
                 if (parameters.size >= 255) {
-                    LRuntime.error(ParserError(peek(), "Cannot have more than 255 parameters"))
+                    LRuntime.error(ParserError(peek(), "Cannot have more than 255 parameters", fileName))
                 }
                 parameters.add(consume(TokenType.IDENTIFIER, "Expect parameters name."))
             } while (match(TokenType.COMMA))
@@ -431,7 +439,7 @@ class Parser(private val tokens: List<Token>) {
             return Expr.Grouping(expr)
         }
 
-        throw ParserError(peek(), "Expect expression.")
+        throw ParserError(peek(), "Expect expression.", fileName)
     }
 
     private fun synchronize() {
@@ -448,8 +456,9 @@ class Parser(private val tokens: List<Token>) {
 
     private fun consume(type: TokenType, message: String): Token {
         if (check(type)) return advance()
-        LRuntime.error(ParserError(peek(), message))
-        throw ParserError(peek(), message)
+        val error = ParserError(peek(), message, fileName)
+        LRuntime.error(error)
+        throw error
     }
 
     private fun match(vararg types: TokenType): Boolean {

@@ -1,41 +1,46 @@
 package pl.bfelis.llang.language
 
+import kotlinx.cli.ArgParser
+import kotlinx.cli.ArgType
+import kotlinx.cli.optional
 import pl.bfelis.llang.language.error.ResolverError
 import pl.bfelis.llang.language.interpreter.RuntimeError
 import java.io.BufferedReader
+import java.io.File
 import java.io.IOException
 import java.io.InputStreamReader
-import java.nio.charset.Charset.defaultCharset
-import java.nio.file.Files
-import java.nio.file.Paths
 import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
-    if (args.size > 1) {
-        println("Usage: language [script]")
-        exitProcess(64)
-    } else if (args.size == 1) {
-        runFile(args[0])
+    val parser = ArgParser("llang")
+
+    val input = parser.argument(ArgType.String, "script", description = "Script to run. If not specified will run in interactive mode.").optional()
+    val debug = parser.option(ArgType.Boolean, "debug", "d", "Debug mode. Will print some arcane staff.")
+
+    parser.parse(args)
+
+    if (!input.value.isNullOrEmpty()) {
+        runFile(input.value!!, debug.value ?: false)
     } else {
         runPrompt()
     }
 }
 
 @Throws(IOException::class)
-private fun runFile(path: String) {
-    val bytes = Files.readAllBytes(Paths.get(path))
-    run(String(bytes, defaultCharset()))
+private fun runFile(path: String, debug: Boolean = false) {
+    run(File(path), debug)
 }
 
 @Throws(IOException::class)
 private fun runPrompt() {
     val input = InputStreamReader(System.`in`)
     val reader = BufferedReader(input)
+    val runtime = LRuntime()
     while (true) {
         print("> ")
         val line = reader.readLine() ?: break
         try {
-            run(line)
+            runtime.run(line)
         } catch (e: ResolverError) {
             resolverError(e)
         } catch (e: RuntimeError) {
@@ -44,9 +49,9 @@ private fun runPrompt() {
     }
 }
 
-private fun run(source: String) {
+private fun run(file: File, debug: Boolean = false) {
     try {
-        LRuntime().run(source)
+        LRuntime(debug).run(file)
     } catch (e: ResolverError) {
         resolverError(e)
         exitProcess(70)
@@ -59,7 +64,7 @@ private fun run(source: String) {
 fun resolverError(error: ResolverError) {
     System.err.println(
         """
-            [line ${error.token?.line}] ${error.message} {${error.token?.lexeme}}
+            ${error.message} {${error.token?.lexeme}}
         """.trimIndent()
     )
 }
@@ -67,7 +72,7 @@ fun resolverError(error: ResolverError) {
 fun runtimeError(error: RuntimeError) {
     System.err.println(
         """
-            [line ${error.token!!.line}] ${error.message}
+            ${error.message}
         """.trimIndent()
     )
 }

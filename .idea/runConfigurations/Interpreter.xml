@@ -4,8 +4,9 @@
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <option name="MAIN_CLASS_NAME" value="pl.bfelis.llang.language.MainKt" />
     <module name="L-lang.main" />
-    <option name="PROGRAM_PARAMETERS" value="scripts\test_parser_error.l" />
+    <option name="PROGRAM_PARAMETERS" value="main.l -d" />
     <shortenClasspath name="NONE" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/scripts/import" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

@@ -9,54 +9,58 @@ import pl.bfelis.llang.language.error.Warning
 import pl.bfelis.llang.language.interpreter.Interpreter
 import pl.bfelis.llang.language.scanner.Token
 import pl.bfelis.llang.language.scanner.TokenType
+import java.io.File
 import java.util.*
 
 data class IdentifierDefinition(val token: Token, val isVal: Boolean = false)
 
-class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Visitor<Unit> {
+class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
+    Expr.Visitor<Unit>,
+    Statement.Visitor<Unit> {
     private val identifiers: Stack<MutableMap<IdentifierDefinition, Int>> = Stack()
     private val scopes: Stack<MutableMap<String, Boolean>> = Stack()
+    private val scripts: MutableList<String> = mutableListOf()
     private var currentFunction = FunctionType.NONE
     private var currentClass = ClassType.CLASS
 
-    override fun visitBlockStatement(statement: Statement.Block) {
-        resolve(statement.statements, true)
+    override fun visitBlockStatement(statement: Statement.Block, fileName: String?) {
+        resolve(statement.statements, true, fileName)
     }
 
-    override fun visitVarStatement(statement: Statement.Var) {
-        declare(statement.name)
+    override fun visitVarStatement(statement: Statement.Var, fileName: String?) {
+        declare(statement.name, fileName = fileName)
         if (statement.initializer != null) {
             resolve(statement.initializer)
         }
         define(statement.name)
     }
 
-    override fun visitValStatement(statement: Statement.Val) {
-        declare(statement.name, true)
+    override fun visitValStatement(statement: Statement.Val, fileName: String?) {
+        declare(statement.name, true, fileName)
         if (statement.initializer != null) {
             resolve(statement.initializer)
         }
         define(statement.name)
     }
 
-    override fun visitVariableExpr(expr: Expr.Variable) {
+    override fun visitVariableExpr(expr: Expr.Variable, fileName: String?) {
         if (!scopes.isEmpty() &&
             scopes.peek()[expr.name.lexeme] === java.lang.Boolean.FALSE
         ) {
-            LRuntime.error(ResolverError(expr.name, "Can't read local variable in its own initializer."))
+            LRuntime.error(ResolverError(expr.name, "Can't read local variable in its own initializer.", fileName))
         }
         resolveLocal(expr, expr.name)
     }
 
-    override fun visitIncrementExpr(expr: Expr.Increment) {
+    override fun visitIncrementExpr(expr: Expr.Increment, fileName: String?) {
         resolveLocal(expr, expr.name)
     }
 
-    override fun visitDecrementExpr(expr: Expr.Decrement) {
+    override fun visitDecrementExpr(expr: Expr.Decrement, fileName: String?) {
         resolveLocal(expr, expr.name)
     }
 
-    override fun visitAssignExpr(expr: Assign) {
+    override fun visitAssignExpr(expr: Assign, fileName: String?) {
         resolve(expr.value)
         resolveLocal(expr, expr.name)
 
@@ -64,101 +68,127 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
             .firstNotNullOf { identifiers[it].filterKeys { k -> k.token.lexeme == expr.name.lexeme }.keys.firstOrNull() }
 
         if (key.isVal) {
-            LRuntime.error(ResolverError(expr.name, "val cannot be reassigned."))
+            LRuntime.error(ResolverError(expr.name, "val cannot be reassigned.", fileName))
         }
     }
 
-    override fun visitAssignIncrementExpr(expr: Expr.AssignIncrement) {
+    override fun visitAssignIncrementExpr(expr: Expr.AssignIncrement, fileName: String?) {
         resolve(expr.value)
         resolveLocal(expr, expr.name)
     }
 
-    override fun visitAssignDecrementExpr(expr: Expr.AssignDecrement) {
+    override fun visitAssignDecrementExpr(expr: Expr.AssignDecrement, fileName: String?) {
         resolve(expr.value)
         resolveLocal(expr, expr.name)
     }
 
-    override fun visitFunctionStatement(statement: Statement.Function) {
-        declare(statement.name)
+    override fun visitFunctionStatement(statement: Statement.Function, fileName: String?) {
+        declare(statement.name, fileName = fileName)
         define(statement.name)
-        resolveFunction(statement, FunctionType.FUNCTION)
+        resolveFunction(statement, FunctionType.FUNCTION, fileName)
     }
 
-    override fun visitExpressionStatement(statement: Statement.Expression) {
+    override fun visitExpressionStatement(statement: Statement.Expression, fileName: String?) {
         resolve(statement.expression)
     }
 
-    override fun visitIfStatement(statement: Statement.If) {
+    override fun visitIfStatement(statement: Statement.If, fileName: String?) {
         resolve(statement.condition)
         resolve(statement.thenBranch)
         if (statement.elseBranch != null) resolve(statement.elseBranch)
     }
 
-    override fun visitPrintStatement(statement: Statement.Print) {
+    override fun visitImportStatement(statement: Statement.Import, fileName: String?) {
+        val scriptName = statement.name.literal as String
+
+        val parentFile = if (!fileName.isNullOrEmpty()) File(fileName) else null
+        val parent = if (parentFile != null) {
+            if (parentFile.isDirectory) parentFile.canonicalPath else parentFile.parent
+        } else null
+
+        val file = if (parent != null) File(parent, scriptName) else File(scriptName)
+
+        if (!file.exists()) LRuntime.error(
+            ResolverError(
+                statement.name,
+                "Script $scriptName does not exists.",
+                fileName
+            )
+        )
+
+        if (scripts.contains(file.canonicalPath)) return
+
+        lRuntime.run(file, true)
+
+        scripts.add(file.canonicalPath)
+    }
+
+    override fun visitPrintStatement(statement: Statement.Print, fileName: String?) {
         resolve(statement.expression)
     }
 
-    override fun visitReturnStatement(statement: Statement.Return) {
+    override fun visitReturnStatement(statement: Statement.Return, fileName: String?) {
         if (currentFunction != FunctionType.FUNCTION) {
-            LRuntime.error(ResolverError(statement.keyword, "Can't return from top-level code."))
+            LRuntime.error(ResolverError(statement.keyword, "Can't return from top-level code.", fileName))
         }
         if (statement.value != null) {
             if (currentFunction == FunctionType.INITIALIZER) {
-                LRuntime.error(ResolverError(statement.keyword, "Can't return a value from an initializer."))
+                LRuntime.error(ResolverError(statement.keyword, "Can't return a value from an initializer.", fileName))
             }
             resolve(statement.value)
         }
     }
 
-    override fun visitWhileStatement(statement: Statement.While) {
+    override fun visitWhileStatement(statement: Statement.While, fileName: String?) {
         resolve(statement.condition)
         resolve(statement.body)
     }
 
-    override fun visitBinaryExpr(expr: Expr.Binary) {
+    override fun visitBinaryExpr(expr: Expr.Binary, fileName: String?) {
         resolve(expr.left)
         resolve(expr.right)
     }
 
-    override fun visitCallExpr(expr: Expr.Call) {
+    override fun visitCallExpr(expr: Expr.Call, fileName: String?) {
         resolve(expr.callee)
         for (argument in expr.arguments) {
             resolve(argument)
         }
     }
 
-    override fun visitGroupingExpr(expr: Expr.Grouping) {
+    override fun visitGroupingExpr(expr: Expr.Grouping, fileName: String?) {
         resolve(expr.expression)
     }
 
-    override fun visitLiteralExpr(expr: Expr.Literal) {
+    override fun visitLiteralExpr(expr: Expr.Literal, fileName: String?) {
     }
 
-    override fun visitLogicalExpr(expr: Expr.Logical) {
+    override fun visitLogicalExpr(expr: Expr.Logical, fileName: String?) {
         resolve(expr.left)
         resolve(expr.right)
     }
 
-    override fun visitLambdaExpr(expr: Expr.Lambda) {
+    override fun visitLambdaExpr(expr: Expr.Lambda, fileName: String?) {
         resolveFunction(
-            Statement.Function(Token(TokenType.FUN, "anonymous", "anonymous", -1), expr.params, expr.body),
-            FunctionType.FUNCTION
+            Statement.Function(Token(TokenType.FUN, "anonymous", "anonymous", expr.line), expr.params, expr.body),
+            FunctionType.FUNCTION,
+            fileName
         )
     }
 
-    override fun visitUnaryExpr(expr: Expr.Unary) {
+    override fun visitUnaryExpr(expr: Expr.Unary, fileName: String?) {
         resolve(expr.right)
     }
 
-    override fun visitClassStatement(statement: Statement.Class) {
+    override fun visitClassStatement(statement: Statement.Class, fileName: String?) {
         val enclosingClass = currentClass
         currentClass = ClassType.CLASS
-        declare(statement.name)
+        declare(statement.name, fileName = fileName)
         define(statement.name)
 
         if (statement.superclass != null) {
             if (statement.superclass.name.lexeme == statement.name.lexeme) {
-                LRuntime.error(ResolverError(statement.superclass.name, "A class can't inherit from itself."))
+                LRuntime.error(ResolverError(statement.superclass.name, "A class can't inherit from itself.", fileName))
             }
             currentClass = ClassType.SUBCLASS
             resolve(statement.superclass)
@@ -175,7 +205,7 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
         for (method in statement.methods) {
             var declaration = FunctionType.METHOD
             if (method.name.lexeme == "init") declaration = FunctionType.INITIALIZER
-            resolveFunction(method, declaration)
+            resolveFunction(method, declaration, fileName)
         }
 
         endScope()
@@ -187,52 +217,54 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
         currentClass = enclosingClass
     }
 
-    override fun visitSuperExpr(expr: Expr.Super) {
+    override fun visitSuperExpr(expr: Expr.Super, fileName: String?) {
         if (currentClass == ClassType.NONE) {
             LRuntime.error(
                 ResolverError(
                     expr.keyword,
-                    "Can't use 'super' outside of a class."
+                    "Can't use 'super' outside of a class.",
+                    fileName
                 )
             )
         } else if (currentClass != ClassType.SUBCLASS) {
             LRuntime.error(
                 ResolverError(
                     expr.keyword,
-                    "Can't use 'super' in a class with no superclass."
+                    "Can't use 'super' in a class with no superclass.",
+                    fileName
                 )
             )
         }
         resolveLocal(expr, expr.keyword)
     }
 
-    override fun visitAccessorExpr(expr: Expr.Accessor) {
+    override fun visitAccessorExpr(expr: Expr.Accessor, fileName: String?) {
         resolve(expr.obj)
         resolve(expr.accessor)
     }
 
-    override fun visitAccessorSetExpr(expr: Expr.AccessorSet) {
+    override fun visitAccessorSetExpr(expr: Expr.AccessorSet, fileName: String?) {
         resolve(expr.accessor)
         resolve(expr.value)
     }
 
-    override fun visitGetExpr(expr: Expr.Get) {
+    override fun visitGetExpr(expr: Expr.Get, fileName: String?) {
         resolve(expr.obj)
     }
 
-    override fun visitSetExpr(expr: Expr.Set) {
+    override fun visitSetExpr(expr: Expr.Set, fileName: String?) {
         resolve(expr.value)
         resolve(expr.obj)
     }
 
-    override fun visitThisExpr(expr: Expr.This) {
+    override fun visitThisExpr(expr: Expr.This, fileName: String?) {
         if (currentClass != ClassType.CLASS) {
-            LRuntime.error(ResolverError(expr.keyword, "Can't use 'this' outside of class."))
+            LRuntime.error(ResolverError(expr.keyword, "Can't use 'this' outside of class.", fileName))
         }
         resolveLocal(expr, expr.keyword)
     }
 
-    fun resolve(statements: List<Statement?>, shouldCreateScope: Boolean = true) {
+    fun resolve(statements: List<Statement?>, shouldCreateScope: Boolean = true, fileName: String?) {
         if (shouldCreateScope) {
             beginScope()
         }
@@ -240,7 +272,7 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
             resolve(statement)
         }
         if (shouldCreateScope) {
-            checkUnusedVariables()
+            checkUnusedVariables(fileName)
             endScope()
         }
     }
@@ -258,27 +290,27 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
         }
     }
 
-    private fun resolveFunction(function: Statement.Function, functionType: FunctionType) {
+    private fun resolveFunction(function: Statement.Function, functionType: FunctionType, fileName: String?) {
         val enclosingFunction = currentFunction
         currentFunction = functionType
         beginScope()
         for (param in function.params) {
-            declare(param)
+            declare(param, fileName = fileName)
             define(param)
         }
-        resolve(function.body, false)
-        checkUnusedVariables()
+        resolve(function.body, false, fileName)
+        checkUnusedVariables(fileName)
         endScope()
         currentFunction = enclosingFunction
     }
 
-    private fun declare(name: Token, isVal: Boolean = false) {
+    private fun declare(name: Token, isVal: Boolean = false, fileName: String? = null) {
         if (scopes.isEmpty() && identifiers.isEmpty()) return
 
         val scope: MutableMap<String, Boolean> = scopes.peek()
         val block: MutableMap<IdentifierDefinition, Int> = identifiers.peek()
         if (scope.containsKey(name.lexeme)) {
-            LRuntime.error(ResolverError(name, "Already a variable with this name in this scope"))
+            LRuntime.error(ResolverError(name, "Already a variable with this name in this scope", fileName))
         }
 
         scope[name.lexeme] = false
@@ -309,11 +341,12 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
         identifiers.pop()
     }
 
-    private fun checkUnusedVariables() {
+    private fun checkUnusedVariables(fileName: String?) {
         val block = identifiers.peek()
         for ((definition, usage) in block) {
             if (usage == 0) {
-                LRuntime.warn(Warning(definition.token, "Unused variable."))
+                println("T: $fileName")
+                LRuntime.warn(Warning(definition.token, "Unused variable.", fileName))
             }
         }
     }
