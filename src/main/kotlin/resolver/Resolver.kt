@@ -141,7 +141,7 @@ class Resolver(val interpreter: Interpreter) : Expr.Visitor<Unit>, Statement.Vis
 
     override fun visitLambdaExpr(expr: Expr.Lambda) {
         resolveFunction(
-            Statement.Function(Token(TokenType.FUN, "anonymous", "anonymous", -1), expr.params, expr.body),
+            Statement.Function(Token(TokenType.FUN, "anonymous", "anonymous", expr.line), expr.params, expr.body),
             FunctionType.FUNCTION
         )
     }
