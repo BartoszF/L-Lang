@@ -79,8 +79,9 @@ class AstPrinter : Expr.Visitor<String>, Statement.Visitor<String> {
     }
 
     override fun visitLambdaExpr(expr: Expr.Lambda): String {
-        return """(Lambda params: ${expr.params}
-            |${currentIndent(1)}${printStatements(expr.body)}
+        return """(Lambda
+            |${currentIndent(1)}(params [${expr.params.joinToString(", ")}]) 
+            |${printStatements(expr.body)}
             |)
         """.trimMargin()
     }
@@ -147,6 +148,10 @@ class AstPrinter : Expr.Visitor<String>, Statement.Visitor<String> {
             |${currentIndent(1)}${statement.elseBranch?.accept(this)}
             |${currentIndent()})
         """.trimIndent()
+    }
+
+    override fun visitImportStatement(statement: Statement.Import): String {
+        return "(Import ${statement.name.lexeme})"
     }
 
     override fun visitPrintStatement(statement: Statement.Print): String {
