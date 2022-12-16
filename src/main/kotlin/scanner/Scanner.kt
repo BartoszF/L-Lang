@@ -3,7 +3,7 @@ package pl.bfelis.llang.language.scanner
 import pl.bfelis.llang.language.LRuntime
 import pl.bfelis.llang.language.error.ScanError
 
-class Scanner(private val source: String, fileName: String? = null) {
+class Scanner(private val source: String, val fileName: String? = null) {
     private val tokens: MutableList<Token> = mutableListOf()
     private var start = 0
     private var current = 0
@@ -56,7 +56,7 @@ class Scanner(private val source: String, fileName: String? = null) {
                 } else if (isAlpha(c)) {
                     identifier()
                 } else {
-                    LRuntime.error(ScanError(line, "Unexpected character $c"))
+                    LRuntime.error(ScanError(line, "Unexpected character $c", fileName))
                 }
             }
         }
@@ -113,7 +113,7 @@ class Scanner(private val source: String, fileName: String? = null) {
             advance()
         }
         if (isAtEnd()) {
-            LRuntime.error(ScanError(line, "Unterminated string"))
+            LRuntime.error(ScanError(line, "Unterminated string", fileName))
         }
 
         // The closing ".
