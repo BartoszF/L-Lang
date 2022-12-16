@@ -32,6 +32,7 @@ class Scanner(private val source: String, val fileName: String? = null) {
             '-' -> addToken(TokenType.MINUS)
             '+' -> addToken(TokenType.PLUS)
             ';' -> addToken(TokenType.SEMICOLON)
+            ':' -> addToken(TokenType.COLON)
             '*' -> addToken(TokenType.STAR)
 
             '!' -> addToken(if (match('=')) TokenType.BANG_EQUAL else TokenType.BANG)
