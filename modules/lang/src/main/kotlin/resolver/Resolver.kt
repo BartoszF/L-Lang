@@ -22,15 +22,40 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
     private val scripts: MutableList<String> = mutableListOf()
     private var currentFunction = FunctionType.NONE
     private var currentClass = ClassType.CLASS
+    private val loopGuard = Stack<Statement>()
 
     override fun visitBlockStatement(statement: Statement.Block, fileName: String?) {
         resolve(statement.statements, true, fileName)
     }
 
+    override fun visitBreakStatement(statement: Statement.Break, fileName: String?) {
+        if (loopGuard.size == 0) {
+            LRuntime.error(
+                ResolverError(
+                    statement.name,
+                    "break not in loop",
+                    fileName
+                )
+            )
+        }
+    }
+
+    override fun visitContinueStatement(statement: Statement.Continue, fileName: String?) {
+        if (loopGuard.size == 0) {
+            LRuntime.error(
+                ResolverError(
+                    statement.name,
+                    "continue not in loop",
+                    fileName
+                )
+            )
+        }
+    }
+
     override fun visitVarStatement(statement: Statement.Var, fileName: String?) {
         declare(statement.name, fileName = fileName)
         if (statement.initializer != null) {
-            resolve(statement.initializer)
+            resolve(statement.initializer, fileName)
         }
         define(statement.name)
     }
@@ -38,7 +63,7 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
     override fun visitValStatement(statement: Statement.Val, fileName: String?) {
         declare(statement.name, true, fileName)
         if (statement.initializer != null) {
-            resolve(statement.initializer)
+            resolve(statement.initializer, fileName)
         }
         define(statement.name)
     }
@@ -61,7 +86,7 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
     }
 
     override fun visitAssignExpr(expr: Assign, fileName: String?) {
-        resolve(expr.value)
+        resolve(expr.value, fileName)
         resolveLocal(expr, expr.name)
 
         val key = identifiers.indices.reversed()
@@ -73,12 +98,12 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
     }
 
     override fun visitAssignIncrementExpr(expr: Expr.AssignIncrement, fileName: String?) {
-        resolve(expr.value)
+        resolve(expr.value, fileName)
         resolveLocal(expr, expr.name)
     }
 
     override fun visitAssignDecrementExpr(expr: Expr.AssignDecrement, fileName: String?) {
-        resolve(expr.value)
+        resolve(expr.value, fileName)
         resolveLocal(expr, expr.name)
     }
 
@@ -88,14 +113,25 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
         resolveFunction(statement, FunctionType.FUNCTION, fileName)
     }
 
+    override fun visitForStatement(statement: Statement.For, fileName: String?) {
+        beginScope()
+        loopGuard.add(statement)
+        statement.initializer?.let { resolve(statement.initializer, fileName) }
+        statement.condition?.let { resolve(statement.condition, fileName) }
+        statement.step?.let { resolve(statement.step, fileName) }
+        resolve(statement.body, fileName)
+        loopGuard.pop()
+        endScope()
+    }
+
     override fun visitExpressionStatement(statement: Statement.Expression, fileName: String?) {
-        resolve(statement.expression)
+        resolve(statement.expression, fileName)
     }
 
     override fun visitIfStatement(statement: Statement.If, fileName: String?) {
-        resolve(statement.condition)
-        resolve(statement.thenBranch)
-        if (statement.elseBranch != null) resolve(statement.elseBranch)
+        resolve(statement.condition, fileName)
+        resolve(statement.thenBranch, fileName)
+        if (statement.elseBranch != null) resolve(statement.elseBranch, fileName)
     }
 
     override fun visitImportStatement(statement: Statement.Import, fileName: String?) {
@@ -131,37 +167,39 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
             if (currentFunction == FunctionType.INITIALIZER) {
                 LRuntime.error(ResolverError(statement.keyword, "Can't return a value from an initializer.", fileName))
             }
-            resolve(statement.value)
+            resolve(statement.value, fileName)
         }
     }
 
     override fun visitWhileStatement(statement: Statement.While, fileName: String?) {
-        resolve(statement.condition)
-        resolve(statement.body)
+        loopGuard.add(statement)
+        resolve(statement.condition, fileName)
+        resolve(statement.body, fileName)
+        loopGuard.pop()
     }
 
     override fun visitBinaryExpr(expr: Expr.Binary, fileName: String?) {
-        resolve(expr.left)
-        resolve(expr.right)
+        resolve(expr.left, fileName)
+        resolve(expr.right, fileName)
     }
 
     override fun visitCallExpr(expr: Expr.Call, fileName: String?) {
-        resolve(expr.callee)
+        resolve(expr.callee, fileName)
         for (argument in expr.arguments) {
-            resolve(argument)
+            resolve(argument, fileName)
         }
     }
 
     override fun visitGroupingExpr(expr: Expr.Grouping, fileName: String?) {
-        resolve(expr.expression)
+        resolve(expr.expression, fileName)
     }
 
     override fun visitLiteralExpr(expr: Expr.Literal, fileName: String?) {
     }
 
     override fun visitLogicalExpr(expr: Expr.Logical, fileName: String?) {
-        resolve(expr.left)
-        resolve(expr.right)
+        resolve(expr.left, fileName)
+        resolve(expr.right, fileName)
     }
 
     override fun visitLambdaExpr(expr: Expr.Lambda, fileName: String?) {
@@ -173,7 +211,7 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
     }
 
     override fun visitUnaryExpr(expr: Expr.Unary, fileName: String?) {
-        resolve(expr.right)
+        resolve(expr.right, fileName)
     }
 
     override fun visitClassStatement(statement: Statement.Class, fileName: String?) {
@@ -187,7 +225,7 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
                 LRuntime.error(ResolverError(statement.superclass.name, "A class can't inherit from itself.", fileName))
             }
             currentClass = ClassType.SUBCLASS
-            resolve(statement.superclass)
+            resolve(statement.superclass, fileName)
         }
 
         if (statement.superclass != null) {
@@ -235,22 +273,22 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
     }
 
     override fun visitAccessorExpr(expr: Expr.Accessor, fileName: String?) {
-        resolve(expr.obj)
-        resolve(expr.accessor)
+        resolve(expr.obj, fileName)
+        resolve(expr.accessor, fileName)
     }
 
     override fun visitAccessorSetExpr(expr: Expr.AccessorSet, fileName: String?) {
-        resolve(expr.accessor)
-        resolve(expr.value)
+        resolve(expr.accessor, fileName)
+        resolve(expr.value, fileName)
     }
 
     override fun visitGetExpr(expr: Expr.Get, fileName: String?) {
-        resolve(expr.obj)
+        resolve(expr.obj, fileName)
     }
 
     override fun visitSetExpr(expr: Expr.Set, fileName: String?) {
-        resolve(expr.value)
-        resolve(expr.obj)
+        resolve(expr.value, fileName)
+        resolve(expr.obj, fileName)
     }
 
     override fun visitThisExpr(expr: Expr.This, fileName: String?) {
@@ -265,7 +303,7 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
             beginScope()
         }
         for (statement in statements) {
-            resolve(statement)
+            resolve(statement, fileName)
         }
         if (shouldCreateScope) {
             checkUnusedVariables(fileName)
@@ -319,12 +357,12 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
         scopes.peek()[name.lexeme] = true
     }
 
-    private fun resolve(stmt: Statement?) {
-        stmt?.accept(this)
+    private fun resolve(stmt: Statement?, fileName: String? = null) {
+        stmt?.accept(this, fileName)
     }
 
-    private fun resolve(expr: Expr) {
-        expr.accept(this)
+    private fun resolve(expr: Expr, fileName: String? = null) {
+        expr.accept(this, fileName)
     }
 
     private fun beginScope() {

@@ -110,6 +110,8 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
         if (match(TokenType.WHILE)) return whileStatement()
         if (match(TokenType.IMPORT)) return importStatement()
         if (match(TokenType.LEFT_BRACE)) return Statement.Block(block())
+        if (match(TokenType.BREAK)) return Statement.Break(previous())
+        if (match(TokenType.CONTINUE)) return Statement.Continue(previous())
 
         return expressionStatement()
     }
@@ -141,16 +143,14 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
 
         var body = statement()
 
-        if (increment != null) {
-            body = Statement.Block(
-                listOf(body, Statement.Expression(increment))
-            )
-        }
+//        if (increment != null) {
+//            body = Statement.Block(
+//                listOf(body, Statement.Expression(increment))
+//            )
+//        }
 
         if (condition == null) condition = Expr.Literal(true)
-        body = Statement.While(condition, body)
-
-        if (initializer != null) body = Statement.Block(listOf(initializer, body))
+        body = Statement.For(initializer, condition, increment, body)
 
         return body
     }

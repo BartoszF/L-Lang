@@ -5,9 +5,12 @@ import pl.bfelis.llang.language.scanner.Token
 abstract class Statement {
     interface Visitor<R> {
         fun visitBlockStatement(statement: Block, fileName: String? = null): R
+        fun visitBreakStatement(statement: Break, fileName: String? = null): R
+        fun visitContinueStatement(statement: Continue, fileName: String? = null): R
         fun visitClassStatement(statement: Class, fileName: String? = null): R
         fun visitExpressionStatement(statement: Expression, fileName: String? = null): R
         fun visitFunctionStatement(statement: Function, fileName: String? = null): R
+        fun visitForStatement(statement: For, fileName: String? = null): R
         fun visitIfStatement(statement: If, fileName: String? = null): R
         fun visitImportStatement(statement: Import, fileName: String? = null): R
         fun visitReturnStatement(statement: Return, fileName: String? = null): R
@@ -22,6 +25,24 @@ abstract class Statement {
 
         override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
             return visitor.visitBlockStatement(this, fileName)
+        }
+    }
+
+    class Break(
+        val name: Token
+    ) : Statement() {
+
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitBreakStatement(this, fileName)
+        }
+    }
+
+    class Continue(
+        val name: Token
+    ) : Statement() {
+
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitContinueStatement(this, fileName)
         }
     }
 
@@ -53,6 +74,18 @@ abstract class Statement {
 
         override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
             return visitor.visitFunctionStatement(this, fileName)
+        }
+    }
+
+    class For(
+        val initializer: Statement?,
+        val condition: Expr?,
+        val step: Expr?,
+        val body: Statement
+    ) : Statement() {
+
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitForStatement(this, fileName)
         }
     }
 

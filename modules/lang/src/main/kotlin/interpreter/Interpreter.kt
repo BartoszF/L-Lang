@@ -2,6 +2,9 @@ package pl.bfelis.llang.language.interpreter
 
 import pl.bfelis.llang.language.ast.Expr
 import pl.bfelis.llang.language.ast.Statement
+import pl.bfelis.llang.language.interpreter.flow.Break
+import pl.bfelis.llang.language.interpreter.flow.Continue
+import pl.bfelis.llang.language.interpreter.flow.Return
 import pl.bfelis.llang.language.interpreter.native.Globals
 import pl.bfelis.llang.language.interpreter.native.LIterable
 import pl.bfelis.llang.language.scanner.Token
@@ -78,8 +81,8 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
                 return (left as Double) < (right as Double)
             }
 
-            TokenType.BANG -> return !isEqual(left, right)
-            TokenType.BANG_EQUAL -> return isEqual(left, right)
+            TokenType.BANG_EQUAL -> return !isEqual(left, right)
+            TokenType.EQUAL_EQUAL -> return isEqual(left, right)
             else -> {
                 throw RuntimeError(expr.operator, "Wrong binary expresion")
             } // TODO: More exhaustive error
@@ -217,6 +220,14 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         executeBlock(statement.statements, Environment(environment))
     }
 
+    override fun visitBreakStatement(statement: Statement.Break, fileName: String?) {
+        throw Break()
+    }
+
+    override fun visitContinueStatement(statement: Statement.Continue, fileName: String?) {
+        throw Continue()
+    }
+
     override fun visitIfStatement(statement: Statement.If, fileName: String?) {
         if (Utils.isTruthy(evaluate(statement.condition))) {
             execute(statement.thenBranch)
@@ -249,7 +260,28 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
 
     override fun visitWhileStatement(statement: Statement.While, fileName: String?) {
         while (Utils.isTruthy(evaluate(statement.condition))) {
-            execute(statement.body)
+            try {
+                execute(statement.body)
+            } catch (br: Break) {
+                return
+            } catch (c: Continue) {
+                // Do nothing
+            }
+        }
+    }
+
+    override fun visitForStatement(statement: Statement.For, fileName: String?) {
+        statement.initializer?.let { execute(it) }
+
+        while (Utils.isTruthy(evaluate(statement.condition!!))) {
+            try {
+                execute(statement.body)
+            } catch (br: Break) {
+                return
+            } catch (c: Continue) {
+                // Do nothing
+            }
+            statement.step?.let { evaluate(it) }
         }
     }
 

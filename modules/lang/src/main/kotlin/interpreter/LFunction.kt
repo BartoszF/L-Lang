@@ -1,6 +1,7 @@
 package pl.bfelis.llang.language.interpreter
 
 import pl.bfelis.llang.language.ast.Statement
+import pl.bfelis.llang.language.interpreter.flow.Return
 
 class LFunction(
     private val declaration: Statement.Function,

@@ -150,6 +150,8 @@ class Scanner(private val source: String, val fileName: String? = null) {
 
         init {
             keywords["and"] = TokenType.AND
+            keywords["break"] = TokenType.BREAK
+            keywords["continue"] = TokenType.CONTINUE
             keywords["class"] = TokenType.CLASS
             keywords["else"] = TokenType.ELSE
             keywords["false"] = TokenType.FALSE
