@@ -123,10 +123,6 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
         scripts.add(file.canonicalPath)
     }
 
-    override fun visitPrintStatement(statement: Statement.Print, fileName: String?) {
-        resolve(statement.expression)
-    }
-
     override fun visitReturnStatement(statement: Statement.Return, fileName: String?) {
         if (!arrayOf(FunctionType.FUNCTION, FunctionType.METHOD).contains(currentFunction)) {
             LRuntime.error(ResolverError(statement.keyword, "Can't return from top-level code.", fileName))

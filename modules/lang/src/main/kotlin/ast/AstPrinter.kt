@@ -154,10 +154,6 @@ class AstPrinter : Expr.Visitor<String>, Statement.Visitor<String> {
         return "(Import ${statement.name.lexeme})"
     }
 
-    override fun visitPrintStatement(statement: Statement.Print, fileName: String?): String {
-        return "(Print ${statement.expression.accept(this)})"
-    }
-
     override fun visitReturnStatement(statement: Statement.Return, fileName: String?): String {
         return "(Return ${statement.keyword.lexeme} ${statement.value?.accept(this)})"
     }

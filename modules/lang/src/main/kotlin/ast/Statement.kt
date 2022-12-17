@@ -10,7 +10,6 @@ abstract class Statement {
         fun visitFunctionStatement(statement: Function, fileName: String? = null): R
         fun visitIfStatement(statement: If, fileName: String? = null): R
         fun visitImportStatement(statement: Import, fileName: String? = null): R
-        fun visitPrintStatement(statement: Print, fileName: String? = null): R
         fun visitReturnStatement(statement: Return, fileName: String? = null): R
         fun visitVarStatement(statement: Var, fileName: String? = null): R
         fun visitValStatement(statement: Val, fileName: String? = null): R
@@ -74,15 +73,6 @@ abstract class Statement {
 
         override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
             return visitor.visitImportStatement(this, fileName)
-        }
-    }
-
-    class Print(
-        val expression: Expr
-    ) : Statement() {
-
-        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
-            return visitor.visitPrintStatement(this, fileName)
         }
     }
 

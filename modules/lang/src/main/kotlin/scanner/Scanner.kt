@@ -158,7 +158,6 @@ class Scanner(private val source: String, val fileName: String? = null) {
             keywords["if"] = TokenType.IF
             keywords["nil"] = TokenType.NIL
             keywords["or"] = TokenType.OR
-            keywords["print"] = TokenType.PRINT
             keywords["return"] = TokenType.RETURN
             keywords["super"] = TokenType.SUPER
             keywords["this"] = TokenType.THIS

@@ -21,7 +21,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
 
     fun interpret(statements: List<Statement?>, fileName: String?) {
         try {
-            statements.forEach { it?.let { statement -> execute(statement) } }
+            statements.forEach { it?.let { statement -> execute(statement, fileName) } }
         } catch (error: RuntimeError) {
             throw error
         }
@@ -112,11 +112,6 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
 
     override fun visitExpressionStatement(statement: Statement.Expression, fileName: String?) {
         evaluate(statement.expression)
-    }
-
-    override fun visitPrintStatement(statement: Statement.Print, fileName: String?) {
-        val value = evaluate(statement.expression)
-        println(Utils.stringify(value))
     }
 
     override fun visitVariableExpr(expr: Expr.Variable, fileName: String?): Any? {
@@ -440,8 +435,8 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         return expr.accept(this)
     }
 
-    private fun execute(statement: Statement) {
-        statement.accept(this)
+    private fun execute(statement: Statement, fileName: String? = null) {
+        statement.accept(this, fileName)
     }
 
     fun executeBlock(

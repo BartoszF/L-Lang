@@ -4,7 +4,6 @@ Expression : Expr expression
 Function   : Token name, List<Token> params, List<Statement?> body
 If         : Expr condition, Statement thenBranch, Statement? elseBranch
 Import     : Token name
-Print      : Expr expression
 Return     : Token keyword, Expr? value
 Var        : Token name, Expr? initializer
 Val        : Token name, Expr? initializer

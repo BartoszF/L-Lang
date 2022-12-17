@@ -4,7 +4,7 @@
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <option name="MAIN_CLASS_NAME" value="pl.bfelis.llang.language.util.ASTGenerator" />
     <module name="llang.modules.lang.main" />
-    <option name="PROGRAM_PARAMETERS" value="src\main\kotlin\ast" />
+    <option name="PROGRAM_PARAMETERS" value="modules\lang\src\main\kotlin\ast" />
     <shortenClasspath name="NONE" />
     <method v="2">
       <option name="Make" enabled="true" />

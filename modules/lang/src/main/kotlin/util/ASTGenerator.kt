@@ -31,7 +31,7 @@ class ASTGenerator {
             val writer = PrintWriter(path, "UTF-8")
             writer.println("package pl.bfelis.llang.language.ast")
             writer.println()
-            writer.println("import Token")
+            writer.println("import pl.bfelis.llang.language.scanner.Token")
             writer.println()
             writer.println("abstract class $baseName {")
 
