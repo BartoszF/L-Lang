@@ -39,12 +39,16 @@ class AstPrinter : Expr.Visitor<String>, Statement.Visitor<String> {
         return parenthesize(expr.operator.lexeme, expr.right)
     }
 
-    private fun parenthesize(name: String, vararg exprs: Expr): String {
+    private fun parenthesize(name: String, vararg exprs: Expr?): String {
         val builder = StringBuilder()
         builder.append("(").append(name)
         for (expr in exprs) {
             builder.append(" ")
-            builder.append(expr.accept(this))
+            if (expr != null) {
+                builder.append(expr.accept(this))
+            } else {
+                builder.append("nil")
+            }
         }
         builder.append(")")
         return builder.toString()
@@ -121,6 +125,14 @@ class AstPrinter : Expr.Visitor<String>, Statement.Visitor<String> {
         """.trimMargin()
     }
 
+    override fun visitBreakStatement(statement: Statement.Break, fileName: String?): String {
+        return "(Break)"
+    }
+
+    override fun visitContinueStatement(statement: Statement.Continue, fileName: String?): String {
+        return "(Continue)"
+    }
+
     override fun visitClassStatement(statement: Statement.Class, fileName: String?): String {
         return """(Class 
             |${currentIndent(1)}(name ${statement.name.lexeme}):${statement.superclass?.accept(this) ?: "no superclass"} 
@@ -139,6 +151,16 @@ class AstPrinter : Expr.Visitor<String>, Statement.Visitor<String> {
             |${printStatements(statement.body)}
             |${currentIndent()})
         """.trimMargin()
+    }
+
+    override fun visitForStatement(statement: Statement.For, fileName: String?): String {
+        return """(For 
+            |${currentIndent(1)}(initializer ${statement.initializer?.accept(this) ?: "nil"})
+            |${currentIndent(1)}${parenthesize("condition", statement.condition)}
+            |${currentIndent(1)}${parenthesize("step", statement.step)}
+            |${currentIndent(1)}${statement.body.accept(this)}
+            |${currentIndent()})
+        """.trimIndent()
     }
 
     override fun visitIfStatement(statement: Statement.If, fileName: String?): String {
