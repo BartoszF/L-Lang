@@ -78,8 +78,8 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
                 return (left as Double) < (right as Double)
             }
 
-            TokenType.BANG -> return !isEqual(left, right)
-            TokenType.BANG_EQUAL -> return isEqual(left, right)
+            TokenType.BANG_EQUAL -> return !isEqual(left, right)
+            TokenType.EQUAL_EQUAL -> return isEqual(left, right)
             else -> {
                 throw RuntimeError(expr.operator, "Wrong binary expresion")
             } // TODO: More exhaustive error
