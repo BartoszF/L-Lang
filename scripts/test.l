@@ -1,80 +1,80 @@
 var xyz = 1
 
 var a = 2
-print 1
-print a
+printLine 1
+printLine a
 
-print "Print (2 + (4 / 2) - 3 * (2 - ( 2 * 18)))"
+printLine "Print (2 + (4 / 2) - 3 * (2 - ( 2 * 18)))"
 var b = (2 + (4 / 2) - 3 * (2 - (2 * 18)))
-print b
+printLine b
 
 var d = "a"
-print d
+printLine d
 
 {
  var a = "test"
- print a
+ printLine a
 }
 
-print a
+printLine a
 a = "4"
-print a
+printLine a
 
-print ""
+printLine ""
 // Test
 {
-    print "I will be 5. Then decreasing by 1"
+    printLine "I will be 5. Then decreasing by 1"
 
     var i = 5
     while(i>0) {
-        print i
+        printLine i
         i=i-1
     }
 }
 
-print clock()
+printLine clock()
 
 {
-    print "Give me first 21 elements of fib"
+    printLine "Give me first 21 elements of fib"
     var a = 0
     var temp
 
     for (var f = 1; a < 10000; f = temp + f) {
-      print a
+      printLine a
       temp = a
       a = f
     }
 }
 
-print clock()
+printLine clock()
 
-print clock
+printLine clock
 
 fun test() {
-    print "INSIDE FUNCTION"
+    printLine "INSIDE FUNCTION"
 }
 
-print test
+printLine test
 test()
 
 fun willReturn(a) {
     return a + 1
 }
 
-print "FUNCTION RETURN"
-print willReturn(2)
+printLine "FUNCTION RETURN"
+printLine willReturn(2)
 
 fun makeCounter() {
     var i = 0
     fun count() {
         i = i + 1
-        print i
+        printLine i
     }
 
     return count
 }
 
-print "CLOSURE TEST"
+printLine "CLOSURE TEST"
 var counter = makeCounter()
 counter()
 counter()
@@ -83,11 +83,11 @@ counter()
 class Test {
     init() {
         this.a = "TEST"
-        print "DUPA"
+        printLine "DUPA"
     }
 
     test() {
-        print a
+        printLine a
     }
 }
 
@@ -95,7 +95,7 @@ var t = Test()
 t.test()
 
 fun empty() {
-    print "TEST"
+    printLine "TEST"
     return
 }
 
@@ -108,16 +108,16 @@ class Vector {
     }
 }
 
-print(Vector(2,3).x)
+printLine(Vector(2,3).x)
 
 var x = 0
 var y = 0
 
 fun testVector() {
-    print(x)
-    print(y)
+    printLine(x)
+    printLine(y)
     var vec = Vector(x,y)
-    print(vec)
+    printLine(vec)
 }
 
 testVector()

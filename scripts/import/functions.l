@@ -1,3 +1,3 @@
 fun testFunction(function) {
-    print(function())
+    printLine(function())
 }

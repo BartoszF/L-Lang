@@ -1,5 +1,9 @@
 
-print("Write me something nice:")
+printLine("Write me something nice:")
 var text = readLine()
 
-print("You wrote: " + text)
+printLine("You wrote: " + text)
+
+print("A")
+print("B")
+print("C")
