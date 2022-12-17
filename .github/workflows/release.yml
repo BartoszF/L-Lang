@@ -21,20 +21,21 @@ jobs:
           cache: gradle
       - name: Gradle permission
         run: chmod +x ./gradlew
-      - name: Build backend
+      - name: Build llang
         run: ./gradlew package -Pversion=${{ env.ver }}
-      - name: 'Upload backend artifact'
+      - name: 'Upload llang artifact'
         uses: actions/upload-artifact@v3
         with:
-          name: backend
+          name: llang
           path: modules/exec/build/llang
           retention-days: 15
       - name: Zip lang
         uses: montudor/action-zip@v1
         with:
-          args: zip -qq -r llang.zip modules/exec/build/llang
-      - name: Upload backend to release
+          args: zip -qq -r llang.zip llang
+        working-directory: modules/exec/build
+      - name: Upload zip to release
         uses: svenstaro/upload-release-action@v2
         with:
           file: llang.zip
-          asset_name: backend-${{ env.ver }}.zip
+          asset_name: llang-${{ env.ver }}.zip

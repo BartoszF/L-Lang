@@ -17,6 +17,6 @@ jobs:
           cache: gradle
       - name: Gradle permission
         run: chmod +x ./gradlew
-      - name: Build backend
+      - name: Build llang
         run: ./gradlew build
 
