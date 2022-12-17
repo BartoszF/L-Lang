@@ -345,7 +345,6 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
         val block = identifiers.peek()
         for ((definition, usage) in block) {
             if (usage == 0) {
-                println("T: $fileName")
                 LRuntime.warn(Warning(definition.token, "Unused variable.", fileName))
             }
         }

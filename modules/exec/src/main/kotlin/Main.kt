@@ -1,8 +1,9 @@
-package pl.bfelis.llang.language
+package pl.bfelis.llang.exec
 
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.optional
+import pl.bfelis.llang.language.LRuntime
 import pl.bfelis.llang.language.error.ResolverError
 import pl.bfelis.llang.language.interpreter.RuntimeError
 import java.io.BufferedReader
