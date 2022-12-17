@@ -37,5 +37,5 @@ jobs:
       - name: Upload zip to release
         uses: svenstaro/upload-release-action@v2
         with:
-          file: llang.zip
+          file: modules/exec/build/llang.zip
           asset_name: llang-${{ env.ver }}.zip
