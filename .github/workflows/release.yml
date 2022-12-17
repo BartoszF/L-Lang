@@ -21,6 +21,8 @@ jobs:
           cache: gradle
       - name: Gradle permission
         run: chmod +x ./gradlew
+      - name: Install zip
+        uses: montudor/action-zip@v1
       - name: Build llang
         run: ./gradlew package -Pversion=${{ env.ver }}
       - name: 'Upload llang artifact'
@@ -30,7 +32,6 @@ jobs:
           path: modules/exec/build/llang
           retention-days: 15
       - name: Zip lang
-        uses: montudor/action-zip@v1
         run: zip -qq -r llang.zip llang
         working-directory: modules/exec/build
       - name: Upload zip to release
