@@ -7,7 +7,7 @@ fun function() {
 
 testFunction(function)
 testFunction(fun () { return "LAMBDA SUCCESS" })
-print(add(1,2))
+printLine(add(1,2))
 
 fun curry(f) {
     fun f1(a) {
@@ -35,4 +35,4 @@ fun sum(a, b) {
 
 var curried = curryLambda(sum)
 
-print(curried(2)(3))
+printLine(curried(2)(3))

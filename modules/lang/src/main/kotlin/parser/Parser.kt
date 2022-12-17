@@ -106,7 +106,6 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
     private fun statement(): Statement {
         if (match(TokenType.FOR)) return forStatement()
         if (match(TokenType.IF)) return ifStatement()
-        if (match(TokenType.PRINT)) return printStatement()
         if (match(TokenType.RETURN)) return returnStatement()
         if (match(TokenType.WHILE)) return whileStatement()
         if (match(TokenType.IMPORT)) return importStatement()
@@ -166,11 +165,6 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
             elseBranch = statement()
         }
         return Statement.If(condition, thenBranch, elseBranch)
-    }
-
-    private fun printStatement(): Statement {
-        val value = expression()
-        return Statement.Print(value)
     }
 
     private fun returnStatement(): Statement {
@@ -447,7 +441,7 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
         while (!isAtEnd()) {
             if (previous().type === TokenType.SEMICOLON) return
             when (peek().type) {
-                TokenType.CLASS, TokenType.FUN, TokenType.VAR, TokenType.FOR, TokenType.IF, TokenType.WHILE, TokenType.PRINT, TokenType.RETURN -> return
+                TokenType.CLASS, TokenType.FUN, TokenType.VAR, TokenType.FOR, TokenType.IF, TokenType.WHILE, TokenType.RETURN -> return
                 else -> {}
             }
             advance()

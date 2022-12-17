@@ -75,8 +75,8 @@ internal class ScannerTest : ShouldSpec({
         should("should return OR and EOF") {
             sourceShouldScanTo("or", TokenType.OR)
         }
-        should("should return PRINT and EOF") {
-            sourceShouldScanTo("print", TokenType.PRINT)
+        should("should return IMPORT and EOF") {
+            sourceShouldScanTo("import", TokenType.IMPORT)
         }
         should("should return RETURN and EOF") {
             sourceShouldScanTo("return", TokenType.RETURN)

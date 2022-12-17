@@ -4,7 +4,7 @@
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <option name="MAIN_CLASS_NAME" value="pl.bfelis.llang.exec.MainKt" />
     <module name="llang.modules.exec.main" />
-    <option name="PROGRAM_PARAMETERS" value="test_class.l -d" />
+    <option name="PROGRAM_PARAMETERS" value="test_read.l -d" />
     <shortenClasspath name="NONE" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/scripts" />
     <method v="2">

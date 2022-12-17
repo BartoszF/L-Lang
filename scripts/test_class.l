@@ -10,19 +10,19 @@ class Test {
 }
 
 val test = Test(1,2)
-print(test.add())
-print(test.a)
-print(test.b)
+printLine(test.add())
+printLine(test.a)
+printLine(test.b)
 
 test.a = 5
-print(test.add())
+printLine(test.add())
 
 class SuperTest : Test {
     add() {
-        print("HA HA, I will now add two numbers!")
+        printLine("HA HA, I will now add two numbers!")
         return super.add()
     }
 }
 
 val superTest = SuperTest(4,2)
-print(superTest.add())
+printLine(superTest.add())

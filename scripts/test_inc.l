@@ -3,21 +3,21 @@ var abs = 2 // Unused
 
 test++
 
-print(test)
+printLine(test)
 
 test--
 
-print(test)
+printLine(test)
 
 test += 4
 
-print(test)
+printLine(test)
 
 test -= 4
 
-print(test)
+printLine(test)
 
 for(var i = 0; i < 5; i++) {
-    print(i)
+    printLine(i)
 }
 

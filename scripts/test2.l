@@ -6,12 +6,12 @@ class TEST {
 
     test() {
         var x = this.b[1]
-        print(x)
+        printLine(x)
         if(this.a >= 12) {
-            print(this.b)
+            printLine(this.b)
         } else {
             for(var x = 0; x < 3; x++) {
-                print("NOPE")
+                printLine("NOPE")
             }
         }
     }
@@ -27,33 +27,33 @@ fun getNumber() {
     return 1
 }
 
-print(getString()[1])
+printLine(getString()[1])
 
 var z = 1
-print(getString()[z])
-print(getString()[getNumber()])
+printLine(getString()[z])
+printLine(getString()[getNumber()])
 
 var t = "TEST"
 t[1] = "3"
 
-print(t)
+printLine(t)
 
 var arr = Array(2)
 
-print(arr[0])
+printLine(arr[0])
 arr[0] = 2
-print(arr[0])
-print("Size is " + string(arr.size()))
+printLine(arr[0])
+printLine("Size is " + string(arr.size()))
 
 var list = List()
 list.add(12)
 
-print("Size is " + string(list.size()))
-print(list[0])
+printLine("Size is " + string(list.size()))
+printLine(list[0])
 
 fun testLambda(t) {
     var res = t()
-    print("LAMBDA RESULT: " + string(res))
+    printLine("LAMBDA RESULT: " + string(res))
 }
 
 testLambda(fun () { return 2 })
