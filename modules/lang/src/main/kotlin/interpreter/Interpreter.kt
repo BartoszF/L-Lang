@@ -253,7 +253,8 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
     }
 
     override fun visitLambdaExpr(expr: Expr.Lambda, fileName: String?): Any {
-        val func = Statement.Function(Token(TokenType.IDENTIFIER, "Lambda", null, expr.line), expr.params, expr.body)
+        val func =
+            Statement.Function(Token(TokenType.IDENTIFIER, "Lambda", null, expr.line), expr.params, expr.body, false)
 
         return LFunction(func, environment, false)
     }
@@ -271,17 +272,24 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
     }
 
     override fun visitForStatement(statement: Statement.For, fileName: String?) {
-        statement.initializer?.let { execute(it) }
+        val previous = this.environment
+        try {
+            this.environment = Environment(previous)
 
-        while (Utils.isTruthy(evaluate(statement.condition!!))) {
-            try {
-                execute(statement.body)
-            } catch (br: Break) {
-                return
-            } catch (c: Continue) {
-                // Do nothing
+            statement.initializer?.let { execute(it) }
+
+            while (Utils.isTruthy(evaluate(statement.condition!!))) {
+                try {
+                    execute(statement.body)
+                } catch (br: Break) {
+                    return
+                } catch (c: Continue) {
+                    // Do nothing
+                }
+                statement.step?.let { evaluate(it) }
             }
-            statement.step?.let { evaluate(it) }
+        } finally {
+            this.environment = previous
         }
     }
 

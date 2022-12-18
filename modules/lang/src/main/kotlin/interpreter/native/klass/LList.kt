@@ -13,7 +13,7 @@ val ListMethods = { env: Environment ->
     )
 }
 
-class LList(env: Environment) : LClass("Array", null, ListMethods(env)) {
+class LList(env: Environment) : LNativeClass("List", null, env, ListMethods(env)) {
     override fun call(interpreter: Interpreter, arguments: List<Any?>): Any {
         return ListInstance(this)
     }
@@ -30,7 +30,7 @@ class ListInstance(klass: LList) : LNativeInstance(klass), LIterable {
                 }
 
                 override fun call(interpreter: Interpreter, arguments: List<Any?>): Any {
-                    return list.size
+                    return list.size.toDouble()
                 }
             }
 
@@ -57,7 +57,7 @@ class ListInstance(klass: LList) : LNativeInstance(klass), LIterable {
             }
 
             else -> {
-                throw RuntimeError(null, "Unknown method")
+                throw RuntimeError(null, "Unknown method $name")
             }
         }
     }
@@ -71,5 +71,9 @@ class ListInstance(klass: LList) : LNativeInstance(klass), LIterable {
         if (index !is Double) throw RuntimeError(null, "Index not a number")
         list[index.toInt()] = value
         return list[index.toInt()]
+    }
+
+    fun addAll(other: List<Any?>) {
+        list.addAll(other)
     }
 }

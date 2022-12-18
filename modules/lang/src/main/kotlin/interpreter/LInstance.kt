@@ -33,25 +33,17 @@ open class LInstance(val klass: LClass, val fields: MutableMap<String, Any?> = m
     }
 }
 
-open class LNativeInstance(klass: LClass, fields: MutableMap<String, Any?> = mutableMapOf()) :
+open class LNativeInstance(klass: LNativeClass, fields: MutableMap<String, Any?> = mutableMapOf()) :
     LInstance(klass, fields) {
     override operator fun get(name: Token): Any? {
-        if (fields.containsKey(name.lexeme)) {
-            return fields[name.lexeme]
-        }
-        val method = klass.findMethod(name.lexeme)
-        if (method != null) {
-            if (method.isNative) {
-                return nativeFn(name.lexeme)
-            }
-
-            return method.bind(this)
-        }
-
-        throw RuntimeError(name, "Undefined property '${name.lexeme}'.")
+        return getMethod(name.lexeme)
     }
 
     override operator fun get(name: String): Any? {
+        return getMethod(name)
+    }
+
+    private fun getMethod(name: String): Any? {
         if (fields.containsKey(name)) {
             return fields[name]
         }
