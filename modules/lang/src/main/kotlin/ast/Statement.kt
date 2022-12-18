@@ -70,7 +70,8 @@ abstract class Statement {
     class Function(
         val name: Token,
         val params: List<Token>,
-        val body: List<Statement?>
+        val body: List<Statement?>,
+        val isStatic: Boolean
     ) : Statement() {
 
         override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {

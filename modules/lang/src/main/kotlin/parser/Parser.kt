@@ -29,7 +29,7 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
     private fun declaration(): Statement? {
         try {
             if (match(TokenType.CLASS)) return classDeclaration()
-            if (match(TokenType.FUN)) return function("function").second
+            if (match(TokenType.FUN)) return function("function")
             if (match(TokenType.VAR)) return varDeclaration()
             if (match(TokenType.VAL)) return valDeclaration()
 
@@ -54,8 +54,8 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
         val methods: MutableList<Statement.Function> = mutableListOf()
         val staticMethods: MutableList<Statement.Function> = mutableListOf()
         while (!check(TokenType.RIGHT_BRACE) && !isAtEnd()) {
-            val (isStatic, method) = function("method)")
-            if (isStatic) {
+            val method = function("method")
+            if (method.isStatic) {
                 staticMethods.add(method)
             } else {
                 methods.add(method)
@@ -67,7 +67,7 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
         return Statement.Class(name, superclass, methods, staticMethods)
     }
 
-    private fun function(kind: String): Pair<Boolean, Statement.Function> {
+    private fun function(kind: String): Statement.Function {
         val isStatic = if (peek().type == TokenType.STATIC) {
             advance()
             true
@@ -91,7 +91,7 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
         consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.")
         consume(TokenType.LEFT_BRACE, "Expect '{' before $kind body.")
         val body: List<Statement?> = block()
-        return isStatic to Statement.Function(name, parameters, body)
+        return Statement.Function(name, parameters, body, isStatic)
     }
 
     private fun varDeclaration(): Statement {
