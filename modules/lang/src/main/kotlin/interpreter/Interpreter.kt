@@ -5,8 +5,8 @@ import pl.bfelis.llang.language.ast.Statement
 import pl.bfelis.llang.language.interpreter.flow.Break
 import pl.bfelis.llang.language.interpreter.flow.Continue
 import pl.bfelis.llang.language.interpreter.flow.Return
-import pl.bfelis.llang.language.interpreter.native.Globals
-import pl.bfelis.llang.language.interpreter.native.LIterable
+import pl.bfelis.llang.language.interpreter.lnative.Globals
+import pl.bfelis.llang.language.interpreter.lnative.LIterable
 import pl.bfelis.llang.language.scanner.Token
 import pl.bfelis.llang.language.scanner.TokenType
 

@@ -1,7 +1,8 @@
-package pl.bfelis.llang.language.interpreter.native.klass
+package pl.bfelis.llang.language.interpreter.lnative.klass.collections
 
 import pl.bfelis.llang.language.interpreter.*
-import pl.bfelis.llang.language.interpreter.native.LIterable
+import pl.bfelis.llang.language.interpreter.lnative.LIterable
+import pl.bfelis.llang.language.interpreter.lnative.klass.getNativeMethodForLClass
 
 val ListMethods = { env: Environment ->
     mutableMapOf(

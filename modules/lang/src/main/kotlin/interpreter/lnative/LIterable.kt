@@ -1,4 +1,4 @@
-package pl.bfelis.llang.language.interpreter.native
+package pl.bfelis.llang.language.interpreter.lnative
 
 interface LIterable {
     fun at(index: Any): Any?

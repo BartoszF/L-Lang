@@ -1,4 +1,4 @@
-package pl.bfelis.llang.language.interpreter.native.klass
+package pl.bfelis.llang.language.interpreter.lnative.klass
 
 import pl.bfelis.llang.language.ast.Statement
 import pl.bfelis.llang.language.interpreter.Environment

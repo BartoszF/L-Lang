@@ -1,6 +1,8 @@
-package pl.bfelis.llang.language.interpreter.native.klass
+package pl.bfelis.llang.language.interpreter.lnative.klass
 
 import pl.bfelis.llang.language.interpreter.*
+import pl.bfelis.llang.language.interpreter.lnative.klass.collections.LList
+import pl.bfelis.llang.language.interpreter.lnative.klass.collections.ListInstance
 import java.io.File
 import java.nio.file.Paths
 
