@@ -38,13 +38,13 @@ class LFile(env: Environment) :
         return LFileInstance(this, path)
     }
 
-    override fun nativeStaticFn(name: String): LFunction? {
+    override fun nativeStaticFn(name: String): LFunction {
         val function = staticMethods[name]!!
         return when (name) {
             "pathExists" -> object : LFunction(function) {
                 override fun arity(): Int = 1
 
-                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any? {
+                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any {
                     val path = arguments[0] as String
                     return File(path).exists()
                 }
@@ -53,7 +53,7 @@ class LFile(env: Environment) :
             "currentDir" -> object : LFunction(function) {
                 override fun arity(): Int = 0
 
-                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any? {
+                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any {
                     return Paths.get("").toAbsolutePath().toString()
                 }
             }
@@ -69,12 +69,12 @@ class LFileInstance(klass: LFile, path: String) : LNativeInstance(klass) {
     private val file = File(path)
     private val env = klass.env
 
-    override fun nativeFn(name: String): Any? {
+    override fun nativeFn(name: String): Any {
         return when (name) {
             "exists" -> object : LCallable {
                 override fun arity(): Int = 0
 
-                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any? {
+                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any {
                     return file.exists()
                 }
             }
@@ -82,7 +82,7 @@ class LFileInstance(klass: LFile, path: String) : LNativeInstance(klass) {
             "isFile" -> object : LCallable {
                 override fun arity(): Int = 0
 
-                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any? {
+                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any {
                     return file.isFile
                 }
             }
@@ -90,7 +90,7 @@ class LFileInstance(klass: LFile, path: String) : LNativeInstance(klass) {
             "isDir" -> object : LCallable {
                 override fun arity(): Int = 0
 
-                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any? {
+                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any {
                     return file.isDirectory
                 }
             }
@@ -98,7 +98,7 @@ class LFileInstance(klass: LFile, path: String) : LNativeInstance(klass) {
             "lines" -> object : LCallable {
                 override fun arity(): Int = 0
 
-                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any? {
+                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any {
                     val list = ListInstance(LList(env))
                     list.addAll(file.readLines())
                     return list
@@ -108,7 +108,7 @@ class LFileInstance(klass: LFile, path: String) : LNativeInstance(klass) {
             "write" -> object : LCallable {
                 override fun arity(): Int = 1
 
-                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any? {
+                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any {
                     val text = arguments[0] as String
                     return file.appendText(text)
                 }
@@ -117,7 +117,7 @@ class LFileInstance(klass: LFile, path: String) : LNativeInstance(klass) {
             "writeLine" -> object : LCallable {
                 override fun arity(): Int = 1
 
-                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any? {
+                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any {
                     val text = arguments[0] as String
                     return file.appendText(text + System.lineSeparator())
                 }
@@ -126,7 +126,7 @@ class LFileInstance(klass: LFile, path: String) : LNativeInstance(klass) {
             "delete" -> object : LCallable {
                 override fun arity(): Int = 0
 
-                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any? {
+                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any {
                     return file.delete()
                 }
             }
