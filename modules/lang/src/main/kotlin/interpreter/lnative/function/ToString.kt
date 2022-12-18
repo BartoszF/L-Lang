@@ -1,4 +1,4 @@
-package pl.bfelis.llang.language.interpreter.native.function
+package pl.bfelis.llang.language.interpreter.lnative.function
 
 import pl.bfelis.llang.language.interpreter.Interpreter
 import pl.bfelis.llang.language.interpreter.LCallable
