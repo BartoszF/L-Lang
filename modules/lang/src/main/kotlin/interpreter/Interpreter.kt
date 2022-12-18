@@ -253,7 +253,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
     }
 
     override fun visitLambdaExpr(expr: Expr.Lambda, fileName: String?): Any {
-        val func = Statement.Function(Token(TokenType.IDENTIFIER, "Lambda", null, expr.line), expr.params, expr.body)
+        val func = Statement.Function(Token(TokenType.IDENTIFIER, "Lambda", null, expr.line), expr.params, expr.body, false)
 
         return LFunction(func, environment, false)
     }

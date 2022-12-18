@@ -12,3 +12,9 @@ printLine(Test.printStatic)
 Test.printStatic()
 
 printLine(Test().notStatic())
+
+static fun test() {
+  printLine("NOPE")
+}
+
+test()

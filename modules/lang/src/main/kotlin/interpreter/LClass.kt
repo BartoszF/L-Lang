@@ -20,7 +20,7 @@ open class LClass(
         return instance
     }
 
-    fun findMethod(name: String): LFunction? {
+    open fun findMethod(name: String): LFunction? {
         if (methods.containsKey(name)) return methods[name]
         if (staticMethods.containsKey(name)) return staticMethods[name]
 
@@ -44,5 +44,28 @@ open class LClass(
 
     override fun toString(): String {
         return name
+    }
+}
+
+open class LNativeClass(
+    name: String,
+    superclass: LClass? = null,
+    methods: MutableMap<String, LFunction> = mutableMapOf(),
+    staticMethods: MutableMap<String, LFunction> = mutableMapOf()
+) : LClass(name, superclass, methods, staticMethods) {
+
+    override fun findMethod(name: String): LFunction? {
+        if (methods.containsKey(name)) return methods[name]
+        if (staticMethods.containsKey(name)) return nativeStaticFn(name)
+
+        if (superclass != null) {
+            return superclass.findMethod(name)
+        }
+
+        return null
+    }
+
+    open fun nativeStaticFn(name: String): LFunction? {
+        return null
     }
 }

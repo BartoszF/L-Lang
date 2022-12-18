@@ -204,7 +204,7 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
 
     override fun visitLambdaExpr(expr: Expr.Lambda, fileName: String?) {
         resolveFunction(
-            Statement.Function(Token(TokenType.FUN, "anonymous", "anonymous", expr.line), expr.params, expr.body),
+            Statement.Function(Token(TokenType.FUN, "anonymous", "anonymous", expr.line), expr.params, expr.body, false),
             FunctionType.FUNCTION,
             fileName
         )

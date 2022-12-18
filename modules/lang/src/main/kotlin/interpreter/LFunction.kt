@@ -3,12 +3,22 @@ package pl.bfelis.llang.language.interpreter
 import pl.bfelis.llang.language.ast.Statement
 import pl.bfelis.llang.language.interpreter.flow.Return
 
-class LFunction(
+open class LFunction(
     private val declaration: Statement.Function,
     private val closure: Environment,
     private val isInitializer: Boolean = false,
-    val isNative: Boolean = false
+    val isNative: Boolean = false,
+    val isStatic: Boolean = false
 ) : LCallable {
+
+    constructor(function: LFunction) : this(
+        function.declaration,
+        function.closure,
+        function.isInitializer,
+        function.isNative,
+        function.isStatic
+    )
+
     override fun arity(): Int = declaration.params.size
 
     override fun call(interpreter: Interpreter, arguments: List<Any?>): Any? {
@@ -39,6 +49,6 @@ class LFunction(
     }
 
     override fun toString(): String {
-        return "<fn ${declaration.name.lexeme}>"
+        return "<fn ${if (isStatic) "static" else ""} ${declaration.name.lexeme}>"
     }
 }

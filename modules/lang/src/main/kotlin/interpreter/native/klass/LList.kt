@@ -13,7 +13,7 @@ val ListMethods = { env: Environment ->
     )
 }
 
-class LList(env: Environment) : LClass("Array", null, ListMethods(env)) {
+class LList(env: Environment) : LNativeClass("Array", null, ListMethods(env)) {
     override fun call(interpreter: Interpreter, arguments: List<Any?>): Any {
         return ListInstance(this)
     }
@@ -57,7 +57,7 @@ class ListInstance(klass: LList) : LNativeInstance(klass), LIterable {
             }
 
             else -> {
-                throw RuntimeError(null, "Unknown method")
+                throw RuntimeError(null, "Unknown method $name")
             }
         }
     }
