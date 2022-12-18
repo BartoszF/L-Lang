@@ -242,6 +242,12 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
             resolveFunction(method, declaration, fileName)
         }
 
+        for (method in statement.staticMethods) {
+            val declaration = FunctionType.METHOD
+            if (method.name.lexeme == "init") LRuntime.error(ResolverError(method.name, "Class cannot have static constructor.", fileName))
+            resolveFunction(method, declaration, fileName)
+        }
+
         endScope()
 
         if (statement.superclass != null) {

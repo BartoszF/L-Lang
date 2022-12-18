@@ -344,7 +344,13 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
             methods[method.name.lexeme] = function
         }
 
-        val klass = LClass(statement.name.lexeme, superClass as LClass?, methods)
+        val staticMethods = mutableMapOf<String, LFunction>()
+        for (method in statement.staticMethods) {
+            val function = LFunction(method, environment, false)
+            staticMethods[method.name.lexeme] = function
+        }
+
+        val klass = LClass(statement.name.lexeme, superClass as LClass?, methods, staticMethods)
 
         if (superClass != null) {
             environment = environment.enclosing!!
@@ -358,7 +364,10 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
             return obj[expr.name]
         }
 
-        println(obj)
+        if (obj is LClass) {
+            return obj[expr.name]
+        }
+
         throw RuntimeError(
             expr.name,
             "Only instances have properties."

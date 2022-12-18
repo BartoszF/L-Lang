@@ -162,6 +162,7 @@ class Scanner(private val source: String, val fileName: String? = null) {
             keywords["or"] = TokenType.OR
             keywords["return"] = TokenType.RETURN
             keywords["super"] = TokenType.SUPER
+            keywords["static"] = TokenType.STATIC
             keywords["this"] = TokenType.THIS
             keywords["true"] = TokenType.TRUE
             keywords["var"] = TokenType.VAR
