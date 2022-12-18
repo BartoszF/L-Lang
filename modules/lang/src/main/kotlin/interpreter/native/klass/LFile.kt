@@ -14,17 +14,25 @@ val fileMethods = { env: Environment ->
             "isDir" to
                 getNativeMethodForLClass("isDir", emptyList(), false, env),
             "isFile" to
-                getNativeMethodForLClass("isFile", emptyList(), false, env)
+                getNativeMethodForLClass("isFile", emptyList(), false, env),
+            "lines" to
+                getNativeMethodForLClass("lines", emptyList(), false, env),
+            "write" to
+                getNativeMethodForLClass("write", listOf("text"), false, env),
+            "writeLine" to
+                getNativeMethodForLClass("writeLine", listOf("text"), false, env),
+            "delete" to
+                getNativeMethodForLClass("delete", emptyList(), false, env)
         ),
         mutableMapOf(
             "pathExists" to getNativeStaticMethodForLClass("pathExists", listOf("path"), env),
             "currentDir" to getNativeStaticMethodForLClass("currentDir", emptyList(), env)
-
         )
     )
 }
 
-class LFile(env: Environment) : LNativeClass("File", null, fileMethods(env).methods, fileMethods(env).staticMethods) {
+class LFile(env: Environment) :
+    LNativeClass("File", null, env, fileMethods(env).methods, fileMethods(env).staticMethods) {
     override fun call(interpreter: Interpreter, arguments: List<Any?>): Any {
         val path = arguments[0] as String
         return LFileInstance(this, path)
@@ -59,6 +67,7 @@ class LFile(env: Environment) : LNativeClass("File", null, fileMethods(env).meth
 
 class LFileInstance(klass: LFile, path: String) : LNativeInstance(klass) {
     private val file = File(path)
+    private val env = klass.env
 
     override fun nativeFn(name: String): Any? {
         return when (name) {
@@ -69,6 +78,7 @@ class LFileInstance(klass: LFile, path: String) : LNativeInstance(klass) {
                     return file.exists()
                 }
             }
+
             "isFile" -> object : LCallable {
                 override fun arity(): Int = 0
 
@@ -76,6 +86,7 @@ class LFileInstance(klass: LFile, path: String) : LNativeInstance(klass) {
                     return file.isFile
                 }
             }
+
             "isDir" -> object : LCallable {
                 override fun arity(): Int = 0
 
@@ -83,8 +94,45 @@ class LFileInstance(klass: LFile, path: String) : LNativeInstance(klass) {
                     return file.isDirectory
                 }
             }
+
+            "lines" -> object : LCallable {
+                override fun arity(): Int = 0
+
+                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any? {
+                    val list = ListInstance(LList(env))
+                    list.addAll(file.readLines())
+                    return list
+                }
+            }
+
+            "write" -> object : LCallable {
+                override fun arity(): Int = 1
+
+                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any? {
+                    val text = arguments[0] as String
+                    return file.appendText(text)
+                }
+            }
+
+            "writeLine" -> object : LCallable {
+                override fun arity(): Int = 1
+
+                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any? {
+                    val text = arguments[0] as String
+                    return file.appendText(text + System.lineSeparator())
+                }
+            }
+
+            "delete" -> object : LCallable {
+                override fun arity(): Int = 0
+
+                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any? {
+                    return file.delete()
+                }
+            }
+
             else -> {
-                throw RuntimeError(null, "Unknown method $name")
+                throw RuntimeError(null, "Unknown static method $name")
             }
         }
     }

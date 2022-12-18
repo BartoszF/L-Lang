@@ -50,6 +50,7 @@ open class LClass(
 open class LNativeClass(
     name: String,
     superclass: LClass? = null,
+    val env: Environment,
     methods: MutableMap<String, LFunction> = mutableMapOf(),
     staticMethods: MutableMap<String, LFunction> = mutableMapOf()
 ) : LClass(name, superclass, methods, staticMethods) {

@@ -33,7 +33,7 @@ open class LInstance(val klass: LClass, val fields: MutableMap<String, Any?> = m
     }
 }
 
-open class LNativeInstance(klass: LClass, fields: MutableMap<String, Any?> = mutableMapOf()) :
+open class LNativeInstance(klass: LNativeClass, fields: MutableMap<String, Any?> = mutableMapOf()) :
     LInstance(klass, fields) {
     override operator fun get(name: Token): Any? {
         return getMethod(name.lexeme)

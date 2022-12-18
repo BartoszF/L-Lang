@@ -49,6 +49,6 @@ open class LFunction(
     }
 
     override fun toString(): String {
-        return "<fn ${if (isStatic) "static" else ""} ${declaration.name.lexeme}>"
+        return "<fn ${if (isStatic) "static" else ""}${declaration.name.lexeme}>"
     }
 }
