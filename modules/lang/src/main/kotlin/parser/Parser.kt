@@ -29,7 +29,7 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
     private fun declaration(): Statement? {
         try {
             if (match(TokenType.CLASS)) return classDeclaration()
-            if (match(TokenType.FUN)) return function("function")
+            if (match(TokenType.FUN)) return function("function").second
             if (match(TokenType.VAR)) return varDeclaration()
             if (match(TokenType.VAL)) return valDeclaration()
 
@@ -52,16 +52,29 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
         consume(TokenType.LEFT_BRACE, "Expect '{' before class body.")
 
         val methods: MutableList<Statement.Function> = mutableListOf()
+        val staticMethods: MutableList<Statement.Function> = mutableListOf()
         while (!check(TokenType.RIGHT_BRACE) && !isAtEnd()) {
-            methods.add(function("method"))
+            val (isStatic, method) = function("method)")
+            if (isStatic) {
+                staticMethods.add(method)
+            } else {
+                methods.add(method)
+            }
         }
 
         consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.")
 
-        return Statement.Class(name, superclass, methods)
+        return Statement.Class(name, superclass, methods, staticMethods)
     }
 
-    private fun function(kind: String): Statement.Function {
+    private fun function(kind: String): Pair<Boolean, Statement.Function> {
+        val isStatic = if (peek().type == TokenType.STATIC) {
+            advance()
+            true
+        } else {
+            false
+        }
+
         val name = consume(TokenType.IDENTIFIER, "Expect $kind name.")
         consume(TokenType.LEFT_PAREN, "Expect '(' after $kind name.")
         val parameters: MutableList<Token> = ArrayList()
@@ -78,7 +91,7 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
         consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.")
         consume(TokenType.LEFT_BRACE, "Expect '{' before $kind body.")
         val body: List<Statement?> = block()
-        return Statement.Function(name, parameters, body)
+        return isStatic to Statement.Function(name, parameters, body)
     }
 
     private fun varDeclaration(): Statement {

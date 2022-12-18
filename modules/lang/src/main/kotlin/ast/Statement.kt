@@ -49,7 +49,8 @@ abstract class Statement {
     class Class(
         val name: Token,
         val superclass: Expr.Variable?,
-        val methods: List<Statement.Function>
+        val methods: List<Statement.Function>,
+        val staticMethods: List<Statement.Function>
     ) : Statement() {
 
         override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {

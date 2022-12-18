@@ -8,11 +8,11 @@ class AstPrinter : Expr.Visitor<String>, Statement.Visitor<String> {
         return "\t".repeat(indent + (plus ?: 0))
     }
 
-    fun printExpr(expr: Expr): String {
+    private fun printExpr(expr: Expr): String {
         return expr.accept(this)
     }
 
-    fun printStatement(statement: Statement?): String {
+    private fun printStatement(statement: Statement?): String {
         return statement?.accept(this) ?: ""
     }
 
@@ -137,6 +137,7 @@ class AstPrinter : Expr.Visitor<String>, Statement.Visitor<String> {
         return """(Class 
             |${currentIndent(1)}(name ${statement.name.lexeme}):${statement.superclass?.accept(this) ?: "no superclass"} 
             |${printStatements(statement.methods)}
+            |${printStatements(statement.staticMethods)}
             |${currentIndent()})
         """.trimMargin()
     }
