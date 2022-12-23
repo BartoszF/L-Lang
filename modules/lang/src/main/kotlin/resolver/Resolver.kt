@@ -21,7 +21,7 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
     private val scopes: Stack<MutableMap<String, Boolean>> = Stack()
     private val scripts: MutableList<String> = mutableListOf()
     private var currentFunction = FunctionType.NONE
-    private var currentClass = ClassType.CLASS
+    private var currentClass = ClassType.NONE
     private val loopGuard = Stack<Statement>()
 
     override fun visitBlockStatement(statement: Statement.Block, fileName: String?) {
@@ -108,6 +108,10 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
     }
 
     override fun visitFunctionStatement(statement: Statement.Function, fileName: String?) {
+        if (currentClass == ClassType.NONE && statement.isStatic) {
+            LRuntime.error(ResolverError(statement.name, "Cannot define static function outside of class", fileName))
+        }
+
         declare(statement.name, fileName = fileName)
         define(statement.name)
         resolveFunction(statement, FunctionType.FUNCTION, fileName)
@@ -195,6 +199,7 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
     }
 
     override fun visitLiteralExpr(expr: Expr.Literal, fileName: String?) {
+        // Nothing to do here
     }
 
     override fun visitLogicalExpr(expr: Expr.Logical, fileName: String?) {
