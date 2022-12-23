@@ -68,12 +68,10 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
     }
 
     private fun function(kind: String): Statement.Function {
-        val isStatic = if (peek().type == TokenType.STATIC) {
+        val isStatic = if (peek().type == TokenType.STATIC) { // Proper use in class
             advance()
             true
-        } else {
-            false
-        }
+        } else previous(2).type == TokenType.STATIC // Not proper use, outside of class or no static at all
 
         val name = consume(TokenType.IDENTIFIER, "Expect $kind name.")
         consume(TokenType.LEFT_PAREN, "Expect '(' after $kind name.")
@@ -455,7 +453,9 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
             if (previous().type === TokenType.SEMICOLON) return
             when (peek().type) {
                 TokenType.CLASS, TokenType.FUN, TokenType.VAR, TokenType.FOR, TokenType.IF, TokenType.WHILE, TokenType.RETURN -> return
-                else -> {}
+                else -> {
+                    // Nothing to do here
+                }
             }
             advance()
         }
@@ -479,7 +479,9 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
     }
 
     private fun check(type: TokenType): Boolean {
-        return if (isAtEnd()) false else peek().type === type
+        return if (isAtEnd()) {
+            false
+        } else peek().type === type
     }
 
     private fun advance(): Token {

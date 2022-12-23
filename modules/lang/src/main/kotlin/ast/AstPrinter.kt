@@ -147,7 +147,7 @@ class AstPrinter : Expr.Visitor<String>, Statement.Visitor<String> {
     }
 
     override fun visitFunctionStatement(statement: Statement.Function, fileName: String?): String {
-        return """(Function ${statement.name.lexeme}
+        return """(Function ${if (statement.isStatic) "static" else ""}${statement.name.lexeme}
             |${currentIndent(1)}(params [${statement.params.joinToString(", ")}]) 
             |${printStatements(statement.body)}
             |${currentIndent()})
