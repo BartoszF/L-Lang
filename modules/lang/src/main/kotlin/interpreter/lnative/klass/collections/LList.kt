@@ -10,7 +10,9 @@ val ListMethods = { env: Environment ->
             getNativeMethodForLClass("init", emptyList(), true, env),
         "size" to getNativeMethodForLClass("size", emptyList(), false, env),
         "add" to getNativeMethodForLClass("add", listOf("element"), false, env),
-        "removeAt" to getNativeMethodForLClass("removeAt", listOf("index"), false, env)
+        "removeAt" to getNativeMethodForLClass("removeAt", listOf("index"), false, env),
+        "map" to getNativeMethodForLClass("map", listOf("function"), false, env),
+        "each" to getNativeMethodForLClass("each", listOf("function"), false, env)
     )
 }
 
@@ -20,8 +22,8 @@ class LList(env: Environment) : LNativeClass("List", null, env, ListMethods(env)
     }
 }
 
-class ListInstance(klass: LList) : LNativeInstance(klass), LIterable {
-    private val list = mutableListOf<Any?>()
+class ListInstance(klass: LList, val list: MutableList<Any?> = mutableListOf()) : LNativeInstance(klass), LIterable<ListInstance> {
+    private val env = klass.env
 
     override fun nativeFn(name: String): Any {
         return when (name) {
@@ -57,6 +59,28 @@ class ListInstance(klass: LList) : LNativeInstance(klass), LIterable {
                 }
             }
 
+            "map" -> object : LCallable {
+                override fun arity(): Int = 1
+
+                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any {
+                    val function = arguments[0] as LFunction
+
+                    return map { function.call(interpreter, listOf(it)) }
+                }
+            }
+
+            "each" -> object : LCallable {
+                override fun arity(): Int = 1
+
+                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any {
+                    val function = arguments[0] as LFunction
+
+                    forEach { function.call(interpreter, listOf(it)) }
+
+                    return Unit
+                }
+            }
+
             else -> {
                 throw RuntimeError(null, "Unknown method $name")
             }
@@ -72,6 +96,15 @@ class ListInstance(klass: LList) : LNativeInstance(klass), LIterable {
         if (index !is Double) throw RuntimeError(null, "Index not a number")
         list[index.toInt()] = value
         return list[index.toInt()]
+    }
+
+    override fun map(function: (Any?) -> Any?): ListInstance {
+        val mapped = list.map(function).toMutableList()
+        return ListInstance(LList(env), mapped)
+    }
+
+    override fun forEach(function: (Any?) -> Unit) {
+        list.forEach(function)
     }
 
     fun addAll(other: List<Any?>) {

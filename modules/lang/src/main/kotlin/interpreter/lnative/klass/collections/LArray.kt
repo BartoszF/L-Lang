@@ -19,8 +19,10 @@ class LArray(env: Environment) : LNativeClass("Array", null, env, ArrayMethods(e
     }
 }
 
-class ArrayInstance(klass: LArray, size: Int) : LNativeInstance(klass), LIterable {
-    private val array = Array<Any?>(size) { null }
+class ArrayInstance(klass: LArray, val array: Array<Any?> = emptyArray()) : LNativeInstance(klass), LIterable<ArrayInstance> {
+    private val env = klass.env
+
+    constructor(klass: LArray, size: Int) : this(klass, Array<Any?>(size) { null })
 
     override fun nativeFn(name: String): Any {
         return when (name) {
@@ -49,5 +51,14 @@ class ArrayInstance(klass: LArray, size: Int) : LNativeInstance(klass), LIterabl
         if (index !is Double) throw RuntimeError(null, "Index not a number")
         array[index.toInt()] = value
         return array[index.toInt()]
+    }
+
+    override fun map(function: (Any?) -> Any?): ArrayInstance {
+        val mapped = array.map(function).toTypedArray()
+        return ArrayInstance(LArray(env), mapped)
+    }
+
+    override fun forEach(function: (Any?) -> Unit) {
+        array.forEach(function)
     }
 }

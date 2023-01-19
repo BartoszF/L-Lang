@@ -368,6 +368,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
 
     override fun visitGetExpr(expr: Expr.Get, fileName: String?): Any? {
         val obj = evaluate(expr.obj)
+
         if (obj is LInstance) {
             return obj[expr.name]
         }
@@ -428,7 +429,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
             return variable[accessor.toInt()]
         }
 
-        if (variable is LIterable) {
+        if (variable is LIterable<*>) {
             return variable.at(accessor)
         }
 
@@ -445,7 +446,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
 
         val value = evaluate(expr.value)
 
-        if (variable is LIterable) {
+        if (variable is LIterable<*>) {
             return variable.set(accessor, value)
         }
 

@@ -21,7 +21,7 @@ fun getNativeMethodForLClass(name: String, params: List<String>, isInit: Boolean
         ),
         env,
         isInit,
-        !isInit,
+        isNative = true,
         isStatic = false
     )
 }
