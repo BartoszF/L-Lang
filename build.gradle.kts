@@ -32,5 +32,6 @@ subprojects {
 
 tasks.register("package") {
     dependsOn(tasks.withType<Test>())
+    dependsOn(project(":modules:lang").tasks.getByName("jar"))
     dependsOn(project(":modules:exec").tasks.getByName("createExe"))
 }
