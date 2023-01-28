@@ -39,12 +39,8 @@ jobs:
         with:
           file: modules/exec/build/llang.zip
           asset_name: llang-${{ env.ver }}.zip
-      - name: 'pwd'
-        run: pwd
-      - name: 'list'
-        run: ls modules/lang/build/libs
       - name: Upload lib to release
         uses: svenstaro/upload-release-action@v2
         with:
-          file: modules/lang/build/libs/lang.jar
+          file: modules/lang/build/libs/lang-${{ env.ver }}.jar
           asset_name: llang-lib-${{ env.ver }}.jar
