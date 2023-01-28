@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.7.20"
@@ -8,10 +9,15 @@ plugins {
 
 val kotestVersion = "5.5.4"
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.5")
 
     implementation(project(":modules:lang"))
+    implementation(kotlin("stdlib-jdk8"))
 }
 
 tasks.withType<Jar> {
@@ -45,4 +51,13 @@ launch4j {
     bundledJreAsFallback = true
     bundledJrePath = "%HKEY_LOCAL_MACHINE\\SOFTWARE\\UnusualJavaVendor\\JavaHome%;%JAVA_HOME%;%PATH%"
     dontWrapJar = false
+}
+
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.kotlinOptions {
+    jvmTarget = "11"
+}
+val compileTestKotlin: KotlinCompile by tasks
+compileTestKotlin.kotlinOptions {
+    jvmTarget = "11"
 }
