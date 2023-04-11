@@ -1,6 +1,7 @@
 package pl.bfelis.llang.language.interpreter.lnative.klass.collections
 
 import pl.bfelis.llang.language.interpreter.*
+import pl.bfelis.llang.language.interpreter.lnative.LCollection
 import pl.bfelis.llang.language.interpreter.lnative.LIterable
 import pl.bfelis.llang.language.interpreter.lnative.klass.getNativeMethodForLClass
 
@@ -8,7 +9,8 @@ val ArrayMethods = { env: Environment ->
     mutableMapOf(
         "init" to
             getNativeMethodForLClass("init", listOf("size"), true, env),
-        "size" to getNativeMethodForLClass("size", emptyList(), false, env)
+        "size" to getNativeMethodForLClass("size", emptyList(), false, env),
+        "iterator" to getNativeMethodForLClass("iterator", emptyList(), false, env)
     )
 }
 
@@ -19,7 +21,9 @@ class LArray(env: Environment) : LNativeClass("Array", null, env, ArrayMethods(e
     }
 }
 
-class ArrayInstance(klass: LArray, val array: Array<Any?> = emptyArray()) : LNativeInstance(klass), LIterable<ArrayInstance> {
+class ArrayInstance(klass: LArray, val array: Array<Any?> = emptyArray()) :
+    LNativeInstance(klass),
+    LCollection<ArrayInstance> {
     private val env = klass.env
 
     constructor(klass: LArray, size: Int) : this(klass, Array<Any?>(size) { null })
@@ -33,6 +37,16 @@ class ArrayInstance(klass: LArray, val array: Array<Any?> = emptyArray()) : LNat
 
                 override fun call(interpreter: Interpreter, arguments: List<Any?>): Any {
                     return array.size
+                }
+            }
+
+            "iterator" -> object : LCallable {
+                override fun arity(): Int {
+                    return 0
+                }
+
+                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any {
+                    return iterator()
                 }
             }
 
@@ -60,5 +74,28 @@ class ArrayInstance(klass: LArray, val array: Array<Any?> = emptyArray()) : LNat
 
     override fun forEach(function: (Any?) -> Unit) {
         array.forEach(function)
+    }
+
+    override fun iterator(): LIterable {
+        return ArrayIterator(array)
+    }
+
+    class ArrayIterator(private val array: Array<Any?>) : LIterable {
+        var cursor = 0
+        override fun next(): Any? {
+            return array[cursor++]
+        }
+
+        override fun getIndex(): Double {
+            return cursor.toDouble()
+        }
+
+        override fun size(): Double {
+            return array.size.toDouble()
+        }
+
+        override fun atEnd(): Boolean {
+            return getIndex() == size()
+        }
     }
 }

@@ -16,6 +16,7 @@ object Globals {
             "print" to Print,
             "string" to ToString,
             "size" to Size,
+            "range" to Range,
             "Array" to LArray(env),
             "List" to LList(env),
             "File" to LFile(env),

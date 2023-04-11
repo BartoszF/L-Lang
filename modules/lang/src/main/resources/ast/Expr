@@ -4,6 +4,7 @@ AssignDecrement : Token name, Expr value
 Binary          : Expr left, Token operator, Expr right
 Call            : Expr callee, Token paren, List<Expr> arguments
 Get             : Expr obj, Token name
+In              : Token name, Expr iterable
 Set             : Expr obj, Token name, Expr value
 Super           : Token keyword, Token method
 Accessor        : Expr obj, Expr accessor, Token accessorToken

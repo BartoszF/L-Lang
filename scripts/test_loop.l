@@ -6,12 +6,12 @@ while(n < 5) {
     n++
 }
 
-for(var i = 0; i < 5; i++) {
+for(i in range(0,5)) {
     printLine("FOR " + string(i))
     if(i == 3) { break }
 }
 
-for(var i = 0; i < 5; i++) {
+for(i in range(0,5)) {
     if(i == 3) { continue }
     printLine("FOR " + string(i))
 }

@@ -21,7 +21,7 @@ class TEST {
         if(this.a >= 12) {
             printLine(this.b)
         } else {
-            for(var x = 0; x < 3; x++) {
+            for(x in range(0,3)) {
                 printLine("NOPE")
             }
         }

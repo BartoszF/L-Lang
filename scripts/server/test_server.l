@@ -5,7 +5,7 @@ val testFile = File("test.html")
 val contents = testFile.lines()
 var length = 0
 
-for(var i = 0; i < contents.size(); i++) {
+for(i in range(0,contents.size())) {
     length += size(contents[i])
 }
 
@@ -15,7 +15,7 @@ server.path("/test", fun (t) {
     t.sendHeaders(200, length)
     val os = t.responseStream()
 
-    for(var i = 0; i < contents.size(); i++) {
+    for(i in range(0,contents.size())) {
         os.write(contents[i])
     }
     os.close()

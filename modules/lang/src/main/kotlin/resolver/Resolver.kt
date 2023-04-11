@@ -77,6 +77,15 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
         resolveLocal(expr, expr.name)
     }
 
+    override fun visitInExpr(expr: Expr.In, fileName: String?) {
+        resolve(expr.iterable)
+
+        define(expr.name)
+        resolveLocal(expr, expr.name)
+
+        resolveLocal(expr, Token(TokenType.IDENTIFIER, "${expr.name.lexeme}_it", null, expr.name.line))
+    }
+
     override fun visitIncrementExpr(expr: Expr.Increment, fileName: String?) {
         resolveLocal(expr, expr.name)
     }
@@ -120,9 +129,7 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
     override fun visitForStatement(statement: Statement.For, fileName: String?) {
         beginScope()
         loopGuard.add(statement)
-        statement.initializer?.let { resolve(statement.initializer, fileName) }
-        statement.condition?.let { resolve(statement.condition, fileName) }
-        statement.step?.let { resolve(statement.step, fileName) }
+        resolve(statement.`in`, fileName)
         resolve(statement.body, fileName)
         loopGuard.pop()
         endScope()
@@ -209,7 +216,12 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
 
     override fun visitLambdaExpr(expr: Expr.Lambda, fileName: String?) {
         resolveFunction(
-            Statement.Function(Token(TokenType.FUN, "anonymous", "anonymous", expr.line), expr.params, expr.body, false),
+            Statement.Function(
+                Token(TokenType.FUN, "anonymous", "anonymous", expr.line),
+                expr.params,
+                expr.body,
+                false
+            ),
             FunctionType.FUNCTION,
             fileName
         )
@@ -249,7 +261,13 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
 
         for (method in statement.staticMethods) {
             val declaration = FunctionType.METHOD
-            if (method.name.lexeme == "init") LRuntime.error(ResolverError(method.name, "Class cannot have static constructor.", fileName))
+            if (method.name.lexeme == "init") LRuntime.error(
+                ResolverError(
+                    method.name,
+                    "Class cannot have static constructor.",
+                    fileName
+                )
+            )
             resolveFunction(method, declaration, fileName)
         }
 

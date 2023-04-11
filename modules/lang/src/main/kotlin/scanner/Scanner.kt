@@ -31,7 +31,6 @@ class Scanner(private val source: String, val fileName: String? = null) {
             '.' -> addToken(TokenType.DOT)
             '-' -> addToken(TokenType.MINUS)
             '+' -> addToken(TokenType.PLUS)
-            ';' -> addToken(TokenType.SEMICOLON)
             ':' -> addToken(TokenType.COLON)
             '*' -> addToken(TokenType.STAR)
 
@@ -158,6 +157,7 @@ class Scanner(private val source: String, val fileName: String? = null) {
             keywords["for"] = TokenType.FOR
             keywords["fun"] = TokenType.FUN
             keywords["if"] = TokenType.IF
+            keywords["in"] = TokenType.IN
             keywords["nil"] = TokenType.NIL
             keywords["or"] = TokenType.OR
             keywords["return"] = TokenType.RETURN

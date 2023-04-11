@@ -26,7 +26,7 @@ printLine(lines)
 printLine("Size: " + string(lines.size()))
 
 printLine("File lines:")
-for(var i = 0; i < lines.size(); i++) {
+for(i in range(0, lines.size()) {
     printLine("  " + lines[i])
 }
 

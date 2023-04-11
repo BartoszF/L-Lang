@@ -39,10 +39,13 @@ printLine clock()
     var a = 0
     var temp
 
-    for (var f = 1; a < 10000; f = temp + f) {
-      printLine a
-      temp = a
-      a = f
+    var f = 1
+
+    while(a < 10000) {
+          printLine a
+          temp = a
+          a = f
+          f = temp + f
     }
 }
 

@@ -123,45 +123,22 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
         if (match(TokenType.LEFT_BRACE)) return Statement.Block(block())
         if (match(TokenType.BREAK)) return Statement.Break(previous())
         if (match(TokenType.CONTINUE)) return Statement.Continue(previous())
+//        if (match(TokenType.IN)) return Statement.In(previous(), expression())
 
         return expressionStatement()
     }
 
     private fun forStatement(): Statement {
         consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.")
-        val initializer = if (match(TokenType.SEMICOLON)) null
-        else if (match(TokenType.VAR)) {
-            varDeclaration()
-        } else {
-            expressionStatement()
-        }
 
-        if (initializer != null) {
-            consume(TokenType.SEMICOLON, "Expect ';' after initializer.")
-        }
+        advance()
 
-        var condition: Expr? = null
-        if (!check(TokenType.SEMICOLON)) {
-            condition = expression()
-        }
-        consume(TokenType.SEMICOLON, "Expect ';' after loop condition.")
+        val inStatement = inStatement()
 
-        var increment: Expr? = null
-        if (!check(TokenType.RIGHT_PAREN)) {
-            increment = expression()
-        }
         consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.")
 
         var body = statement()
-
-//        if (increment != null) {
-//            body = Statement.Block(
-//                listOf(body, Statement.Expression(increment))
-//            )
-//        }
-
-        if (condition == null) condition = Expr.Literal(true)
-        body = Statement.For(initializer, condition, increment, body)
+        body = Statement.For(inStatement, body)
 
         return body
     }
@@ -176,6 +153,11 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
             elseBranch = statement()
         }
         return Statement.If(condition, thenBranch, elseBranch)
+    }
+
+    private fun inStatement(): Expr.In {
+        consume(TokenType.IN, "Expect 'in' in for-loops.")
+        return Expr.In(previous(2), expression())
     }
 
     private fun returnStatement(): Statement {
@@ -450,7 +432,6 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
     private fun synchronize() {
         advance()
         while (!isAtEnd()) {
-            if (previous().type === TokenType.SEMICOLON) return
             when (peek().type) {
                 TokenType.CLASS, TokenType.FUN, TokenType.VAR, TokenType.FOR, TokenType.IF, TokenType.WHILE, TokenType.RETURN -> return
                 else -> {
