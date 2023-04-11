@@ -9,6 +9,8 @@ import pl.bfelis.llang.language.interpreter.lnative.Globals
 import pl.bfelis.llang.language.interpreter.lnative.HasIterator
 import pl.bfelis.llang.language.interpreter.lnative.LCollection
 import pl.bfelis.llang.language.interpreter.lnative.LIterable
+import pl.bfelis.llang.language.interpreter.lnative.klass.collections.LList
+import pl.bfelis.llang.language.interpreter.lnative.klass.collections.ListInstance
 import pl.bfelis.llang.language.scanner.Token
 import pl.bfelis.llang.language.scanner.TokenType
 
@@ -97,6 +99,10 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
 
     override fun visitLiteralExpr(expr: Expr.Literal, fileName: String?): Any? {
         return expr.value
+    }
+
+    override fun visitListDefExpr(expr: Expr.ListDef, fileName: String?): Any? {
+        return ListInstance(LList(environment), expr.elements.map { evaluate(it) }.toMutableList())
     }
 
     override fun visitUnaryExpr(expr: Expr.Unary, fileName: String?): Any {

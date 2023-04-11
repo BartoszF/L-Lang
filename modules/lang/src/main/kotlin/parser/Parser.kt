@@ -320,11 +320,19 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
     }
 
     private fun factor(): Expr {
-        var expr: Expr = unary()
+        var expr: Expr = index()
         while (match(TokenType.SLASH, TokenType.STAR)) {
             val operator = previous()
             val right: Expr = unary()
             expr = Expr.Binary(expr, operator, right)
+        }
+        return expr
+    }
+
+    private fun index(): Expr {
+        var expr: Expr = unary()
+        if (match(TokenType.LEFT_BRACKET)) {
+            expr = accessor(expr)
         }
         return expr
     }
@@ -424,6 +432,20 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
             val expr = expression()
             consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
             return Expr.Grouping(expr)
+        }
+
+        if (match(TokenType.LEFT_BRACKET)) {
+            val values = mutableListOf<Expr>()
+            while (peek().type != TokenType.RIGHT_BRACKET) {
+                val expr = expression()
+                values.add(expr)
+                if (peek().type == TokenType.RIGHT_BRACKET) break
+                consume(TokenType.COMMA, "Expect ',' between list elements.")
+            }
+            println(peek())
+            consume(TokenType.RIGHT_BRACKET, "Expect ']' at end of list.")
+
+            return Expr.ListDef(values)
         }
 
         throw ParserError(peek(), "Expect expression.", fileName)

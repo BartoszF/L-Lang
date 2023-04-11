@@ -18,6 +18,7 @@ abstract class Expr {
         fun visitThisExpr(expr: This, fileName: String? = null): R
         fun visitGroupingExpr(expr: Grouping, fileName: String? = null): R
         fun visitLiteralExpr(expr: Literal, fileName: String? = null): R
+        fun visitListDefExpr(expr: ListDef, fileName: String? = null): R
         fun visitLogicalExpr(expr: Logical, fileName: String? = null): R
         fun visitLambdaExpr(expr: Lambda, fileName: String? = null): R
         fun visitUnaryExpr(expr: Unary, fileName: String? = null): R
@@ -164,6 +165,15 @@ abstract class Expr {
 
         override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
             return visitor.visitLiteralExpr(this, fileName)
+        }
+    }
+
+    class ListDef(
+        val elements: List<Expr>
+    ) : Expr() {
+
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitListDefExpr(this, fileName)
         }
     }
 

@@ -209,6 +209,10 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
         // Nothing to do here
     }
 
+    override fun visitListDefExpr(expr: Expr.ListDef, fileName: String?) {
+        expr.elements.forEach { resolve(it) }
+    }
+
     override fun visitLogicalExpr(expr: Expr.Logical, fileName: String?) {
         resolve(expr.left, fileName)
         resolve(expr.right, fileName)

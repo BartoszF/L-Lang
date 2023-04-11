@@ -12,6 +12,7 @@ AccessorSet     : Expr.Accessor accessor, Expr value
 This            : Token keyword
 Grouping        : Expr expression
 Literal         : Any? value
+ListDef         : List<Expr> elements
 Logical         : Expr left, Token operator, Expr right
 Lambda          : Int line, List<Token> params, List<Statement?> body
 Unary           : Token operator, Expr right

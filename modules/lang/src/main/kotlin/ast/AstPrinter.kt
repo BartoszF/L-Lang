@@ -35,6 +35,10 @@ class AstPrinter : Expr.Visitor<String>, Statement.Visitor<String> {
         return "(Literal ${if (expr.value == null) "nil" else expr.value.toString()})"
     }
 
+    override fun visitListDefExpr(expr: Expr.ListDef, fileName: String?): String {
+        return "(List ${expr.elements.map { it.accept(this) }})"
+    }
+
     override fun visitUnaryExpr(expr: Expr.Unary, fileName: String?): String {
         return parenthesize(expr.operator.lexeme, expr.right)
     }
