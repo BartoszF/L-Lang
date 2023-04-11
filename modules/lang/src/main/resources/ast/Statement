@@ -10,4 +10,5 @@ Import     : Token name
 Return     : Token keyword, Expr? value
 Var        : Token name, Expr? initializer
 Val        : Token name, Expr? initializer
+ListSpread : List<Token> names, Expr initializer, Boolean isVal
 While      : Expr condition, Statement body

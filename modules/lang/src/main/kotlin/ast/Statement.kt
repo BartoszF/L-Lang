@@ -16,6 +16,7 @@ abstract class Statement {
         fun visitReturnStatement(statement: Return, fileName: String? = null): R
         fun visitVarStatement(statement: Var, fileName: String? = null): R
         fun visitValStatement(statement: Val, fileName: String? = null): R
+        fun visitListSpreadStatement(statement: ListSpread, fileName: String? = null): R
         fun visitWhileStatement(statement: While, fileName: String? = null): R
     }
 
@@ -136,6 +137,17 @@ abstract class Statement {
 
         override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
             return visitor.visitValStatement(this, fileName)
+        }
+    }
+
+    class ListSpread(
+        val names: List<Token>,
+        val initializer: Expr,
+        val isVal: Boolean
+    ) : Statement() {
+
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitListSpreadStatement(this, fileName)
         }
     }
 

@@ -195,6 +195,10 @@ class AstPrinter : Expr.Visitor<String>, Statement.Visitor<String> {
         return "(Val ${statement.name.lexeme} = ${statement.initializer?.accept(this) ?: "nil"})"
     }
 
+    override fun visitListSpreadStatement(statement: Statement.ListSpread, fileName: String?): String {
+        return "(ListSpread ${statement.names.map { it.lexeme }} = ${statement.initializer.accept(this)})"
+    }
+
     override fun visitWhileStatement(statement: Statement.While, fileName: String?): String {
         return """(While 
             |${currentIndent(1)}${parenthesize("condition", statement.condition)}

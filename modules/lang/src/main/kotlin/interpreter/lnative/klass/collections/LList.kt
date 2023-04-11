@@ -129,6 +129,10 @@ class ListInstance(klass: LList, val list: MutableList<Any?> = mutableListOf()) 
         return ListIterator(list)
     }
 
+    override fun toString(): String {
+        return "List@$list"
+    }
+
     class ListIterator(private val list: MutableList<Any?>) : LIterable {
         var cursor = 0
         override fun next(): Any? {

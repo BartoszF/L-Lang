@@ -92,7 +92,38 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
         return Statement.Function(name, parameters, body, isStatic)
     }
 
+    private fun mapUntil(separator: TokenType, message: String, end: TokenType, block: () -> Unit) {
+        while (!check(end)) {
+            block()
+            if (check(end)) return
+            consume(separator, message)
+        }
+    }
+
+    private fun listSpread(isVal: Boolean = false): Statement {
+        println(peek())
+        val names = mutableListOf<Token>()
+        mapUntil(TokenType.COMMA, "Expect ',' between list elements.", TokenType.RIGHT_BRACKET) {
+            val name = consume(TokenType.IDENTIFIER, "Expect identifier.")
+            names.add(name)
+        }
+        consume(TokenType.RIGHT_BRACKET, "Expect ']' after list destructure operator.")
+
+        val initializer: Expr
+        if (match(TokenType.EQUAL)) {
+            initializer = expression()
+        } else {
+            throw ParserError(peek(), "list desctructure needs initializer.", fileName)
+        }
+
+        return Statement.ListSpread(names, initializer, isVal)
+    }
+
     private fun varDeclaration(): Statement {
+        if (check(TokenType.LEFT_BRACKET)) {
+            advance()
+            return listSpread(false)
+        }
         val name = consume(TokenType.IDENTIFIER, "Expect variable name.")
         var initializer: Expr? = null
         if (match(TokenType.EQUAL)) {
@@ -103,6 +134,10 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
     }
 
     private fun valDeclaration(): Statement {
+        if (check(TokenType.LEFT_BRACKET)) {
+            advance()
+            return listSpread(true)
+        }
         val name = consume(TokenType.IDENTIFIER, "Expect variable name.")
         val initializer: Expr
         if (match(TokenType.EQUAL)) {
@@ -123,7 +158,6 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
         if (match(TokenType.LEFT_BRACE)) return Statement.Block(block())
         if (match(TokenType.BREAK)) return Statement.Break(previous())
         if (match(TokenType.CONTINUE)) return Statement.Continue(previous())
-//        if (match(TokenType.IN)) return Statement.In(previous(), expression())
 
         return expressionStatement()
     }
@@ -436,13 +470,16 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
 
         if (match(TokenType.LEFT_BRACKET)) {
             val values = mutableListOf<Expr>()
-            while (peek().type != TokenType.RIGHT_BRACKET) {
+            mapUntil(TokenType.COMMA, "Expect ',' between list elements.", TokenType.RIGHT_BRACKET) {
                 val expr = expression()
                 values.add(expr)
-                if (peek().type == TokenType.RIGHT_BRACKET) break
-                consume(TokenType.COMMA, "Expect ',' between list elements.")
             }
-            println(peek())
+//            while (!check(TokenType.RIGHT_BRACKET)) {
+//                val expr = expression()
+//                values.add(expr)
+//                if (check(TokenType.RIGHT_BRACKET)) break
+//                consume(TokenType.COMMA, "Expect ',' between list elements.")
+//            }
             consume(TokenType.RIGHT_BRACKET, "Expect ']' at end of list.")
 
             return Expr.ListDef(values)

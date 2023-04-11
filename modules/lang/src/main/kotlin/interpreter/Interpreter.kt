@@ -101,7 +101,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         return expr.value
     }
 
-    override fun visitListDefExpr(expr: Expr.ListDef, fileName: String?): Any? {
+    override fun visitListDefExpr(expr: Expr.ListDef, fileName: String?): Any {
         return ListInstance(LList(environment), expr.elements.map { evaluate(it) }.toMutableList())
     }
 
@@ -175,6 +175,40 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         }
 
         environment.define(statement.name.lexeme, value)
+    }
+
+    override fun visitListSpreadStatement(statement: Statement.ListSpread, fileName: String?) {
+        val value = evaluate(statement.initializer)
+
+        val iterator =
+            when (value) {
+                is LIterable -> {
+                    value
+                }
+
+                is HasIterator -> {
+                    value.iterator()
+                }
+
+                else -> {
+                    throw RuntimeError(statement.names.last(), "Expect iterable as list destructure initializer.")
+                }
+            }
+
+        val list = mutableListOf<Any?>()
+        for (i in 0 until iterator.size().toInt()) {
+            list.add(iterator.next())
+        }
+
+        val first = list.take(statement.names.size - 1)
+        val rest = list.drop(statement.names.size - 1).toMutableList()
+
+        for (i in 0 until statement.names.size - 1) {
+            environment.define(statement.names[i].lexeme, first.getOrNull(i))
+        }
+
+        val mappedRest = if (rest.size == 0) null else ListInstance(LList(environment), rest)
+        environment.define(statement.names.last().lexeme, mappedRest)
     }
 
     override fun visitAssignExpr(expr: Expr.Assign, fileName: String?): Any? {

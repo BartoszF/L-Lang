@@ -68,6 +68,14 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
         define(statement.name)
     }
 
+    override fun visitListSpreadStatement(statement: Statement.ListSpread, fileName: String?) {
+        statement.names.forEach {
+            declare(it, statement.isVal, fileName)
+            define(it)
+        }
+        resolve(statement.initializer, fileName)
+    }
+
     override fun visitVariableExpr(expr: Expr.Variable, fileName: String?) {
         if (!scopes.isEmpty() &&
             scopes.peek()[expr.name.lexeme] === java.lang.Boolean.FALSE
