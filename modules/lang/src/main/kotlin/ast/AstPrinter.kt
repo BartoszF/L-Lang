@@ -118,6 +118,10 @@ class AstPrinter : Expr.Visitor<String>, Statement.Visitor<String> {
         return parenthesize("accessorSet", expr.accessor, expr.value)
     }
 
+    override fun visitInExpr(expr: Expr.In, fileName: String?): String {
+        return "(in ${expr.name} ${expr.iterable.accept(this)})"
+    }
+
     override fun visitBlockStatement(statement: Statement.Block, fileName: String?): String {
         return """(Block 
             |${printStatements(statement.statements)}
@@ -156,9 +160,7 @@ class AstPrinter : Expr.Visitor<String>, Statement.Visitor<String> {
 
     override fun visitForStatement(statement: Statement.For, fileName: String?): String {
         return """(For 
-            |${currentIndent(1)}(initializer ${statement.initializer?.accept(this) ?: "nil"})
-            |${currentIndent(1)}${parenthesize("condition", statement.condition)}
-            |${currentIndent(1)}${parenthesize("step", statement.step)}
+            |${currentIndent(1)}${statement.`in`.accept(this)}
             |${currentIndent(1)}${statement.body.accept(this)}
             |${currentIndent()})
         """.trimIndent()

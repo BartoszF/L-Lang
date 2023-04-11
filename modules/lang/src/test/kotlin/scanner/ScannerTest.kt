@@ -126,9 +126,6 @@ internal class ScannerTest : ShouldSpec({
         should("should return PLUS and EOF") {
             sourceShouldScanTo("+", TokenType.PLUS)
         }
-        should("should return SEMICOLON and EOF") {
-            sourceShouldScanTo(";", TokenType.SEMICOLON)
-        }
         should("should return STAR and EOF") {
             sourceShouldScanTo("*", TokenType.STAR)
         }

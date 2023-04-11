@@ -13,7 +13,7 @@ printLine(test)
     printLine(a)
 }
 
-for(var i = 0; i < 5; i = i + 1){
+for(i in range(0,5)) {
     val counter = i + 1
     printLine(counter)
 }

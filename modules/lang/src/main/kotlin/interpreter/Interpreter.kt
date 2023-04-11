@@ -6,6 +6,8 @@ import pl.bfelis.llang.language.interpreter.flow.Break
 import pl.bfelis.llang.language.interpreter.flow.Continue
 import pl.bfelis.llang.language.interpreter.flow.Return
 import pl.bfelis.llang.language.interpreter.lnative.Globals
+import pl.bfelis.llang.language.interpreter.lnative.HasIterator
+import pl.bfelis.llang.language.interpreter.lnative.LCollection
 import pl.bfelis.llang.language.interpreter.lnative.LIterable
 import pl.bfelis.llang.language.scanner.Token
 import pl.bfelis.llang.language.scanner.TokenType
@@ -13,7 +15,7 @@ import pl.bfelis.llang.language.scanner.TokenType
 class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
 
     val globals = Environment()
-    private var environment = globals
+    var environment = globals
     private val locals: MutableMap<Expr, Int> = mutableMapOf()
 
     init {
@@ -236,6 +238,28 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         }
     }
 
+    override fun visitInExpr(expr: Expr.In, fileName: String?) {
+        val name = expr.name
+
+//        val iteratorCall = Expr.Call(
+//            Expr.Get(expr.iterable, Token(TokenType.IDENTIFIER, "iterator", null, name.line)),
+//            name,
+//            emptyList()
+//        )
+        var value = evaluate(expr.iterable)
+
+        if (value is LIterable) {
+            // Nothing to do
+        } else if (value is HasIterator) {
+            value = value.iterator()
+        } else {
+            throw RuntimeError(expr.name, "Provided iterable has no iterator!", fileName)
+        }
+
+        environment.define("${name.lexeme}_it", value)
+        environment.define(name.lexeme, value.next())
+    }
+
     override fun visitImportStatement(statement: Statement.Import, fileName: String?) {
         // Nothing to do here - everything is done in resolver.
     }
@@ -275,10 +299,19 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         val previous = this.environment
         try {
             this.environment = Environment(previous)
+            statement.`in`.accept(this)
 
-            statement.initializer?.let { execute(it) }
+            val iterator = lookupVariable(
+                Token(
+                    TokenType.IDENTIFIER,
+                    "${statement.`in`.name.lexeme}_it",
+                    null,
+                    statement.`in`.name.line
+                ),
+                statement.`in`
+            ) as LIterable
 
-            while (Utils.isTruthy(evaluate(statement.condition!!))) {
+            while (true) {
                 try {
                     execute(statement.body)
                 } catch (br: Break) {
@@ -286,7 +319,15 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
                 } catch (c: Continue) {
                     // Do nothing
                 }
-                statement.step?.let { evaluate(it) }
+
+                if (!iterator.atEnd()) {
+                    val distance = locals[statement.`in`]
+                    if (distance != null) {
+                        environment.assignAt(distance, statement.`in`.name, iterator.next())
+                    } else {
+                        globals.assign(statement.`in`.name, iterator.next())
+                    }
+                } else break
             }
         } finally {
             this.environment = previous
@@ -429,7 +470,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
             return variable[accessor.toInt()]
         }
 
-        if (variable is LIterable<*>) {
+        if (variable is LCollection<*>) {
             return variable.at(accessor)
         }
 
@@ -446,7 +487,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
 
         val value = evaluate(expr.value)
 
-        if (variable is LIterable<*>) {
+        if (variable is LCollection<*>) {
             return variable.set(accessor, value)
         }
 

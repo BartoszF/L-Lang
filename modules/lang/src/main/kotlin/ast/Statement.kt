@@ -80,9 +80,7 @@ abstract class Statement {
     }
 
     class For(
-        val initializer: Statement?,
-        val condition: Expr?,
-        val step: Expr?,
+        val `in`: Expr.In,
         val body: Statement
     ) : Statement() {
 

@@ -4,7 +4,7 @@ Continue   : Token name
 Class      : Token name, Expr.Variable? superclass, List<Statement.Function> methods, List<Statement.Function> staticMethods
 Expression : Expr expression
 Function   : Token name, List<Token> params, List<Statement?> body, Boolean isStatic
-For        : Statement? initializer, Expr? condition, Expr? step, Statement body
+For        : Expr.In `in`, Statement body
 If         : Expr condition, Statement thenBranch, Statement? elseBranch
 Import     : Token name
 Return     : Token keyword, Expr? value

@@ -17,7 +17,7 @@ test -= 4
 
 printLine(test)
 
-for(var i = 0; i < 5; i++) {
+for(i in range(0,5)) {
     printLine(i)
 }
 

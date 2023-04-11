@@ -10,6 +10,7 @@ abstract class Expr {
         fun visitBinaryExpr(expr: Binary, fileName: String? = null): R
         fun visitCallExpr(expr: Call, fileName: String? = null): R
         fun visitGetExpr(expr: Get, fileName: String? = null): R
+        fun visitInExpr(expr: In, fileName: String? = null): R
         fun visitSetExpr(expr: Set, fileName: String? = null): R
         fun visitSuperExpr(expr: Super, fileName: String? = null): R
         fun visitAccessorExpr(expr: Accessor, fileName: String? = null): R
@@ -84,6 +85,16 @@ abstract class Expr {
 
         override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
             return visitor.visitGetExpr(this, fileName)
+        }
+    }
+
+    class In(
+        val name: Token,
+        val iterable: Expr
+    ) : Expr() {
+
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitInExpr(this, fileName)
         }
     }
 
