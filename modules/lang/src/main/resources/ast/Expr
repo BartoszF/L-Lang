@@ -15,6 +15,7 @@ Literal         : Any? value
 ListDef         : List<Expr> elements
 Logical         : Expr left, Token operator, Expr right
 Lambda          : Int line, List<Token> params, List<Statement?> body
+Slice           : Token token, Expr obj, Expr? start, Expr? count
 Unary           : Token operator, Expr right
 Variable        : Token name
 Increment       : Token name

@@ -150,5 +150,11 @@ class ListInstance(klass: LList, val list: MutableList<Any?> = mutableListOf()) 
         override fun atEnd(): Boolean {
             return getIndex() == size()
         }
+
+        override fun slice(start: Int, count: Int?): MutableList<Any?> {
+            val startingFrom = list.drop(start)
+
+            return (count?.let { startingFrom.take(count) } ?: startingFrom).toMutableList()
+        }
     }
 }

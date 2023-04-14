@@ -94,6 +94,15 @@ class AstPrinter : Expr.Visitor<String>, Statement.Visitor<String> {
         """.trimMargin()
     }
 
+    override fun visitSliceExpr(expr: Expr.Slice, fileName: String?): String {
+        return "(Slice ${expr.obj.accept(this)} ${parenthesize("start", expr.start)} ${
+        parenthesize(
+            "count",
+            expr.count
+        )
+        }}"
+    }
+
     override fun visitCallExpr(expr: Expr.Call, fileName: String?): String {
         return parenthesize("Call", expr.callee, *expr.arguments.toTypedArray())
     }

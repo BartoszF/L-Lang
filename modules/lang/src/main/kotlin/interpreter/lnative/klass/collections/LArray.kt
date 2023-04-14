@@ -97,5 +97,11 @@ class ArrayInstance(klass: LArray, val array: Array<Any?> = emptyArray()) :
         override fun atEnd(): Boolean {
             return getIndex() == size()
         }
+
+        override fun slice(start: Int, count: Int?): MutableList<Any?> {
+            val startingFrom = array.drop(start)
+
+            return (count?.let { startingFrom.take(count) } ?: startingFrom).toMutableList()
+        }
     }
 }

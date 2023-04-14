@@ -323,6 +323,25 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         return LFunction(func, environment, false)
     }
 
+    override fun visitSliceExpr(expr: Expr.Slice, fileName: String?): Any {
+        var value = evaluate(expr.obj)
+
+        if (value is LIterable) {
+            // Nothing to do
+        } else if (value is HasIterator) {
+            value = value.iterator()
+        } else {
+            throw RuntimeError(expr.token, "Provided iterable has no iterator!", fileName)
+        }
+
+        val index: Double = expr.start?.let { evaluate(it) as Double } ?: 0.0
+        val count: Double? = expr.count?.let { evaluate(it) as Double }
+
+        val sliced = value.slice(index.toInt(), count?.toInt())
+
+        return ListInstance(LList(environment), sliced)
+    }
+
     override fun visitWhileStatement(statement: Statement.While, fileName: String?) {
         while (Utils.isTruthy(evaluate(statement.condition))) {
             try {
