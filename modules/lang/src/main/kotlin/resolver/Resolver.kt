@@ -239,6 +239,12 @@ class Resolver(val interpreter: Interpreter, private val lRuntime: LRuntime) :
         )
     }
 
+    override fun visitSliceExpr(expr: Expr.Slice, fileName: String?) {
+        resolve(expr.obj)
+        expr.start?.let { resolve(it) }
+        expr.count?.let { resolve(it) }
+    }
+
     override fun visitUnaryExpr(expr: Expr.Unary, fileName: String?) {
         resolve(expr.right, fileName)
     }

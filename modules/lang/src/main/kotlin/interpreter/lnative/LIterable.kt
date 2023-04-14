@@ -5,4 +5,5 @@ interface LIterable {
     fun getIndex(): Double
     fun size(): Double
     fun atEnd(): Boolean
+    fun slice(start: Int = 0, count: Int? = null): MutableList<Any?>
 }

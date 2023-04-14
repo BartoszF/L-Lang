@@ -49,12 +49,17 @@ jobs:
     name: Deploy docs to gh-pages
     runs-on: ubuntu-latest
     steps:
+      - run: |
+          e="ver="
+          ver=$(echo "${{ github.event.release.tag_name }}" | sed 's/^.//')
+          echo "${e}${ver}" >> $GITHUB_ENV
       - name: Checkout
         uses: actions/checkout@v3
 
       - name: Install and Build 🔧
         run: |
           cd modules/docs
+          npm version ${{ env.ver }}
           npm ci
           npm run build
 

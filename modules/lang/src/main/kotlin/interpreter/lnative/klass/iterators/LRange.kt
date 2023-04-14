@@ -3,6 +3,8 @@ package pl.bfelis.llang.language.interpreter.lnative.klass.iterators
 import pl.bfelis.llang.language.interpreter.*
 import pl.bfelis.llang.language.interpreter.lnative.LIterable
 import pl.bfelis.llang.language.interpreter.lnative.klass.getNativeMethodForLClass
+import java.util.stream.IntStream.range
+import kotlin.streams.toList
 
 val RangeMethods = { env: Environment ->
     mutableMapOf(
@@ -43,5 +45,19 @@ class RangeInstance(klass: LRange, val start: Double = 0.0, val end: Double = 10
 
     override fun atEnd(): Boolean {
         return current == end
+    }
+
+    override fun slice(start: Int, count: Int?): MutableList<Any?> {
+        return range(
+            this.start.toInt() + start,
+            (count?.let { this.start.toInt() + start + count } ?: this.end.toInt()).coerceAtMost(this.end.toInt())
+        )
+            .toList()
+            .map { it.toDouble() } // L operates on Doubles
+            .toMutableList()
+    }
+
+    override fun toString(): String {
+        return "Range@[${range(start.toInt(), end.toInt()).toList().map { it.toDouble() }.joinToString(", ")}]"
     }
 }

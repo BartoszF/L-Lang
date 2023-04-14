@@ -21,6 +21,7 @@ abstract class Expr {
         fun visitListDefExpr(expr: ListDef, fileName: String? = null): R
         fun visitLogicalExpr(expr: Logical, fileName: String? = null): R
         fun visitLambdaExpr(expr: Lambda, fileName: String? = null): R
+        fun visitSliceExpr(expr: Slice, fileName: String? = null): R
         fun visitUnaryExpr(expr: Unary, fileName: String? = null): R
         fun visitVariableExpr(expr: Variable, fileName: String? = null): R
         fun visitIncrementExpr(expr: Increment, fileName: String? = null): R
@@ -196,6 +197,18 @@ abstract class Expr {
 
         override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
             return visitor.visitLambdaExpr(this, fileName)
+        }
+    }
+
+    class Slice(
+        val token: Token,
+        val obj: Expr,
+        val start: Expr?,
+        val count: Expr?
+    ) : Expr() {
+
+        override fun <R> accept(visitor: Visitor<R>, fileName: String?): R {
+            return visitor.visitSliceExpr(this, fileName)
         }
     }
 

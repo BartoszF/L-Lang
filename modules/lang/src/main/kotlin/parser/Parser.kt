@@ -381,7 +381,27 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
     }
 
     private fun accessor(callee: Expr): Expr {
+        if (match(TokenType.COLON)) {
+            // Only slice count
+            val expr = term()
+            consume(TokenType.RIGHT_BRACKET, "Expect closing ].")
+            return Expr.Slice(previous(2), callee, null, expr)
+        }
+
         val rest = term()
+
+        if (match(TokenType.COLON)) {
+            // Slice start index
+            if (match(TokenType.RIGHT_BRACKET)) {
+                // Only slice start index
+                return Expr.Slice(previous(2), callee, rest, null)
+            }
+
+            // Both slice start and count
+            val expr = term()
+            consume(TokenType.RIGHT_BRACKET, "Expect closing ].")
+            return Expr.Slice(previous(3), callee, rest, expr)
+        }
 
         consume(TokenType.RIGHT_BRACKET, "Expect closing ].")
         val accessorToken = tokens[current - 2]
@@ -474,12 +494,6 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
                 val expr = expression()
                 values.add(expr)
             }
-//            while (!check(TokenType.RIGHT_BRACKET)) {
-//                val expr = expression()
-//                values.add(expr)
-//                if (check(TokenType.RIGHT_BRACKET)) break
-//                consume(TokenType.COMMA, "Expect ',' between list elements.")
-//            }
             consume(TokenType.RIGHT_BRACKET, "Expect ']' at end of list.")
 
             return Expr.ListDef(values)
