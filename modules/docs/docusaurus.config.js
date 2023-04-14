@@ -93,7 +93,7 @@ const config = {
               },
               {
                 label: 'Syntax',
-                to: '/docs/category/syntax',
+                to: '/docs/syntax',
               },
             ],
           },

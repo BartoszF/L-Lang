@@ -1,7 +1,7 @@
 name: Run deployment on release
 'on':
   release:
-    types: [released]
+    types: [ released ]
 
 jobs:
   build_and_upload_artifact:
@@ -44,3 +44,21 @@ jobs:
         with:
           file: modules/lang/build/libs/lang-${{ env.ver }}.jar
           asset_name: llang-lib-${{ env.ver }}.jar
+
+  deploy_docs:
+    name: Deploy docs to gh-pages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install and Build 🔧
+        run: |
+          cd modules/docs
+          npm ci
+          npm run build
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: modules/docs/build # The folder the action should deploy.
