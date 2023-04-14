@@ -18,3 +18,10 @@ printLine("")
 printLine("X: " + string(x))
 printLine("Y: " + string(y))
 printLine("Z: " + string(z))
+
+
+val [u,v,w] = range(0,5)
+printLine("")
+printLine("U: " + string(u))
+printLine("V: " + string(v))
+printLine("W: " + string(w))

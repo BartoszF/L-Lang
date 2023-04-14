@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "pl.bfelis"
-version = "0.1-SNAPSHOT"
+version = "0.0.4"
 
 repositories {
     mavenLocal()

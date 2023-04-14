@@ -1,0 +1,326 @@
+---
+sidebar_position: 2
+---
+
+# Syntax
+
+## Strings
+
+Text wrapped by quotes is treated as string, f.e. `"THIS IS STRING"`
+
+## Numbers
+
+L operates on double-precision numbers, there are no "integers" per se.
+
+Every number will be, well, a number, f.e. `1`, `42` or `3.14`.
+
+## Booleans
+
+True or false - `true`, `false`
+
+### Boolean algebra
+
+L has standard set of boolean operators:
+- `and`
+- `or`
+- not - `!`
+- less - `<`
+- greater - `>`
+- equal - `==`
+- not equal - `!=`
+- less or equal - `<=`
+- greater or equal - `>=`
+
+Examples:
+
+```
+var willBeTrue = true or false
+var willBeFalse = true and false
+
+var check = willBeTrue and !willBeFalse // true
+var nope = willBeTrue == willBeFalse // false
+```
+
+## Nil
+
+`nil` - nothing, empty value
+
+```
+var nothing = nil
+```
+
+## Variables
+
+Variables holds some values, to be later user or modified.
+Variables looks like this:
+```
+var identifier = value
+```
+
+You can hold everything in variables - strings, numbers, functions (more on functions later) and class instances (more on classes later).
+
+Sometimes you don't want to modify your variables - don't worry, L has vals as well
+```
+val identifier = value
+```
+
+Examples:
+
+```
+var text = "test"
+var number = 12.34
+val youCantChangeMe = ";_;"
+```
+
+### Variable operations
+
+Of course, you can re-assign variables `text = "other text"`.
+
+But you can also
+
+#### Increment
+`number++`
+
+#### Decrement
+`number--`
+
+#### Plus assign
+`number += 5`
+
+#### Minus assign
+`number -= 2`
+
+## Conditionals
+
+You can branch your code based on conditions using `if` statement.
+
+```
+var a = 12
+var b = 13
+
+if(a == b) {
+  print("equal")
+} else {
+  print("not equal")
+}
+```
+
+In if statements, you can use anything from boolean algebra.
+
+## Loops
+
+### While
+
+```
+while(condition) {
+  codeBlock
+}
+```
+
+This loop will repeat execution of codeBlock, while condition is true.
+For example:
+
+```
+var i = 0
+while(i < 5) {
+  printLine("WORKING!")
+  i++
+}
+```
+
+### For-each loop
+
+```
+for(variableName in iterable) {
+  codeBlock
+}
+```
+
+For-each loop creates variable and iterates over iterable data-type (f.e. lists or ranges).
+
+```
+for(i in range(0,5)) {
+    printLine(i)
+}
+```
+
+
+### Control flow
+
+You can break out of a loop
+
+```
+for(i in range(0,5)) {
+    if(i == 3) break
+    printLine(i)
+}
+
+// Will print:
+// 0
+// 1
+// 2
+```
+
+You can also skip current loop cycle with `continue`
+
+```
+for(i in range(0,5)) {
+    if(i == 3) continue
+    printLine(i)
+}
+
+// Will print:
+// 0
+// 1
+// 2
+// 4
+```
+
+## Functions
+
+Functions are defined like so:
+```
+fun functionName(arguments) {
+  return expression
+}
+```
+
+You can omit return keyword, then function won't return a value.
+
+Exemplary functions:
+```
+fun add(a, b) {
+  return a + b
+}
+
+fun doSomethingFun(text) {
+  print(text)
+}
+```
+
+### Passing functions to functions
+
+You can pass functions to other functions as well:
+
+```
+fun executeFunction(f) {
+  return f(1)
+}
+
+fun returnNumberPlusOne(number) {
+  return number + 1
+}
+
+print(executeFunction(returnNumberPlusOne))
+```
+
+### Currying
+
+```
+fun curry(f) {
+    fun f1(a) {
+      fun f2(b) {
+        return f(a, b)
+      }
+
+      return f2
+    }
+
+    return f1
+}
+
+fun sum(a, b) {
+    return a + b
+}
+
+var curried = curry(sum)
+print(curried(2)(3))
+```
+
+### Lambda functions
+
+You can create anonymous functions (let's see on example above, we will only change curry function)
+```
+fun curryLambda(f) {
+    return fun (a) {
+      return fun (b) {
+        return f(a, b)
+      }
+    }
+}
+```
+
+You can also pass lambdas as function arguments
+```
+someFunction(fun(a) { return a + 1 })
+```
+
+## Classes
+
+```
+class Test {
+  init(a, b) {
+    this.a = a
+    this.b = b
+  }
+
+  add() {
+    return this.a + this.b
+  }
+}
+
+val test = Test(1,2)
+print(test.add())
+print(test.a)
+print(test.b)
+
+test.a = 5
+print(test.add())
+```
+
+### Inheritance
+
+```
+class SuperTest : Test {
+    add() {
+        print("HA HA, I will now add two numbers!")
+        return super.add()
+    }
+}
+
+val superTest = SuperTest(4,2)
+print(superTest.add())
+```
+
+
+### Lists and Iterators
+
+Lists should be part of Standard Library, but there is handy syntax for lists creation:
+
+```
+val list = [1,2,3,4]
+```
+
+#### Iterable destructuring
+
+```
+val list = [1,2,3,4]
+val [a,b,c] = list
+
+// a = 1
+// b = 2
+// c = [3,4]
+```
+
+It can be used with iterables as well:
+
+```
+val it = range(0,5)
+val [a,b,c] = it
+
+// a = 0
+// b = 1
+// c = [2,3,4]
+```
+
+
