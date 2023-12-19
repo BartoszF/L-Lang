@@ -124,7 +124,7 @@ class AstPrinter : Expr.Visitor<String>, Statement.Visitor<String> {
     }
 
     override fun visitAccessorExpr(expr: Expr.Accessor, fileName: String?): String {
-        return "(accessor ${expr.obj.accept(this)} [${expr.accessor.accept(this)}]}"
+        return "(accessor ${expr.obj.accept(this)} [${expr.accessor.accept(this)}]"
     }
 
     override fun visitAccessorSetExpr(expr: Expr.AccessorSet, fileName: String?): String {
@@ -182,7 +182,7 @@ class AstPrinter : Expr.Visitor<String>, Statement.Visitor<String> {
     override fun visitIfStatement(statement: Statement.If, fileName: String?): String {
         return """(If ${statement.condition.accept(this)}
             |${currentIndent(1)}${statement.thenBranch.accept(this)} 
-            |${currentIndent(1)}(ELSE 
+            |${currentIndent()}(ELSE 
             |${currentIndent(1)}${statement.elseBranch?.accept(this)}
             |${currentIndent()})
         """.trimIndent()

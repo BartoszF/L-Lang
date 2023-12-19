@@ -28,7 +28,7 @@ abstract class Expr {
         fun visitDecrementExpr(expr: Decrement, fileName: String? = null): R
     }
 
-    class Assign(
+    data class Assign(
         val name: Token,
         val value: Expr
     ) : Expr() {
@@ -38,7 +38,7 @@ abstract class Expr {
         }
     }
 
-    class AssignIncrement(
+    data class AssignIncrement(
         val name: Token,
         val value: Expr
     ) : Expr() {
@@ -48,7 +48,7 @@ abstract class Expr {
         }
     }
 
-    class AssignDecrement(
+    data class AssignDecrement(
         val name: Token,
         val value: Expr
     ) : Expr() {
@@ -58,7 +58,7 @@ abstract class Expr {
         }
     }
 
-    class Binary(
+    data class Binary(
         val left: Expr,
         val operator: Token,
         val right: Expr
@@ -69,7 +69,7 @@ abstract class Expr {
         }
     }
 
-    class Call(
+    data class Call(
         val callee: Expr,
         val paren: Token,
         val arguments: List<Expr>
@@ -80,7 +80,7 @@ abstract class Expr {
         }
     }
 
-    class Get(
+    data class Get(
         val obj: Expr,
         val name: Token
     ) : Expr() {
@@ -90,7 +90,7 @@ abstract class Expr {
         }
     }
 
-    class In(
+    data class In(
         val name: Token,
         val iterable: Expr
     ) : Expr() {
@@ -100,7 +100,7 @@ abstract class Expr {
         }
     }
 
-    class Set(
+    data class Set(
         val obj: Expr,
         val name: Token,
         val value: Expr
@@ -111,7 +111,7 @@ abstract class Expr {
         }
     }
 
-    class Super(
+    data class Super(
         val keyword: Token,
         val method: Token
     ) : Expr() {
@@ -121,7 +121,7 @@ abstract class Expr {
         }
     }
 
-    class Accessor(
+    data class Accessor(
         val obj: Expr,
         val accessor: Expr,
         val accessorToken: Token
@@ -132,7 +132,7 @@ abstract class Expr {
         }
     }
 
-    class AccessorSet(
+    data class AccessorSet(
         val accessor: Expr.Accessor,
         val value: Expr
     ) : Expr() {
@@ -142,7 +142,7 @@ abstract class Expr {
         }
     }
 
-    class This(
+    data class This(
         val keyword: Token
     ) : Expr() {
 
@@ -151,7 +151,7 @@ abstract class Expr {
         }
     }
 
-    class Grouping(
+    data class Grouping(
         val expression: Expr
     ) : Expr() {
 
@@ -160,7 +160,7 @@ abstract class Expr {
         }
     }
 
-    class Literal(
+    data class Literal(
         val value: Any?
     ) : Expr() {
 
@@ -169,7 +169,7 @@ abstract class Expr {
         }
     }
 
-    class ListDef(
+    data class ListDef(
         val elements: List<Expr>
     ) : Expr() {
 
@@ -178,7 +178,7 @@ abstract class Expr {
         }
     }
 
-    class Logical(
+    data class Logical(
         val left: Expr,
         val operator: Token,
         val right: Expr
@@ -189,7 +189,7 @@ abstract class Expr {
         }
     }
 
-    class Lambda(
+    data class Lambda(
         val line: Int,
         val params: List<Token>,
         val body: List<Statement?>
@@ -200,7 +200,7 @@ abstract class Expr {
         }
     }
 
-    class Slice(
+    data class Slice(
         val token: Token,
         val obj: Expr,
         val start: Expr?,
@@ -212,7 +212,7 @@ abstract class Expr {
         }
     }
 
-    class Unary(
+    data class Unary(
         val operator: Token,
         val right: Expr
     ) : Expr() {
@@ -222,7 +222,7 @@ abstract class Expr {
         }
     }
 
-    class Variable(
+    data class Variable(
         val name: Token
     ) : Expr() {
 
@@ -231,7 +231,7 @@ abstract class Expr {
         }
     }
 
-    class Increment(
+    data class Increment(
         val name: Token
     ) : Expr() {
 
@@ -240,7 +240,7 @@ abstract class Expr {
         }
     }
 
-    class Decrement(
+    data class Decrement(
         val name: Token
     ) : Expr() {
 

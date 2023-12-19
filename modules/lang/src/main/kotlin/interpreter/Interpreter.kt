@@ -72,7 +72,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
 
             TokenType.GREATER_EQUAL -> {
                 checkNumberOperands(expr.operator, left, right)
-                return (left as Double) > (right as Double)
+                return (left as Double) >= (right as Double)
             }
 
             TokenType.LESS -> {
@@ -82,7 +82,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
 
             TokenType.LESS_EQUAL -> {
                 checkNumberOperands(expr.operator, left, right)
-                return (left as Double) < (right as Double)
+                return (left as Double) <= (right as Double)
             }
 
             TokenType.BANG_EQUAL -> return !isEqual(left, right)
@@ -514,7 +514,11 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         val accessor = try {
             (evaluate(expr.accessor) as Double)
         } catch (ex: Exception) {
-            throw RuntimeError(expr.accessorToken, "Wrong data type for accessor.")
+            throw RuntimeError(
+                expr.accessorToken,
+                "Wrong data type for accessor. Got ${evaluate(expr.accessor)} expected Number",
+                fileName
+            )
         }
 
         if (variable is Array<*>) {
@@ -541,7 +545,11 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         val accessor = try {
             (evaluate(expr.accessor.accessor) as Double)
         } catch (ex: Exception) {
-            throw RuntimeError(expr.accessor.accessorToken, "Wrong data type for accessor.")
+            throw RuntimeError(
+                expr.accessor.accessorToken,
+                "Wrong data type for accessor. Got ${evaluate(expr.accessor.accessor)} expected Number.",
+                fileName
+            )
         }
 
         val value = evaluate(expr.value)

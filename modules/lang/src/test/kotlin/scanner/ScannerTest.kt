@@ -114,6 +114,9 @@ internal class ScannerTest : ShouldSpec({
         should("should return RIGHT_BRACKET and EOF") {
             sourceShouldScanTo("]", TokenType.RIGHT_BRACKET)
         }
+        should("should return COLON and EOF") {
+            sourceShouldScanTo(":", TokenType.COLON)
+        }
         should("should return COMMA and EOF") {
             sourceShouldScanTo(",", TokenType.COMMA)
         }

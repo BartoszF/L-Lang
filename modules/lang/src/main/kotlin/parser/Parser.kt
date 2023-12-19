@@ -405,12 +405,20 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
 
         consume(TokenType.RIGHT_BRACKET, "Expect closing ].")
         val accessorToken = tokens[current - 2]
+        var acc = Expr.Accessor(callee, rest, accessorToken)
 
-        return Expr.Accessor(callee, rest, accessorToken)
+        if (match(TokenType.LEFT_BRACKET)) {
+            acc = accessor(acc) as Expr.Accessor
+        }
+
+        return acc
     }
 
     private fun call(): Expr {
         var expr = primary()
+        if (match(TokenType.LEFT_BRACKET)) {
+            expr = accessor(expr)
+        }
         while (true) {
             expr = if (match(TokenType.LEFT_PAREN)) {
                 finishCall(expr)
@@ -421,9 +429,7 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
                 break
             }
         }
-        if (match(TokenType.LEFT_BRACKET)) {
-            expr = accessor(expr)
-        }
+
         return expr
     }
 

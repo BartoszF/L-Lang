@@ -56,7 +56,7 @@ class ASTGenerator {
             className: String,
             fieldList: String
         ) {
-            writer.println("  class $className(")
+            writer.println("  data class $className(")
 
             val fields = fieldList.split(", ".toRegex()).toTypedArray()
 
