@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[26],{2686:a=>{a.exports=JSON.parse('{"title":"Standard library","slug":"/category/standard-library","permalink":"/docs/category/standard-library","navigation":{"previous":{"title":"Syntax","permalink":"/docs/syntax"},"next":{"title":"List","permalink":"/docs/standard-library/list"}}}')}}]);
