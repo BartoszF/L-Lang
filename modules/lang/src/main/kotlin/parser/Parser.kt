@@ -71,7 +71,11 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
         val isStatic = if (peek().type == TokenType.STATIC) { // Proper use in class
             advance()
             true
-        } else previous(2).type == TokenType.STATIC // Not proper use, outside of class or no static at all
+        } else try {
+            previous(2).type == TokenType.STATIC
+        } catch (ex: Throwable) {
+            false
+        } // Not proper use, outside of class or no static at all
 
         val name = consume(TokenType.IDENTIFIER, "Expect $kind name.")
         consume(TokenType.LEFT_PAREN, "Expect '(' after $kind name.")
@@ -405,12 +409,20 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
 
         consume(TokenType.RIGHT_BRACKET, "Expect closing ].")
         val accessorToken = tokens[current - 2]
+        var acc = Expr.Accessor(callee, rest, accessorToken)
 
-        return Expr.Accessor(callee, rest, accessorToken)
+        if (match(TokenType.LEFT_BRACKET)) {
+            acc = accessor(acc) as Expr.Accessor
+        }
+
+        return acc
     }
 
     private fun call(): Expr {
         var expr = primary()
+        if (match(TokenType.LEFT_BRACKET)) {
+            expr = accessor(expr)
+        }
         while (true) {
             expr = if (match(TokenType.LEFT_PAREN)) {
                 finishCall(expr)
@@ -421,9 +433,7 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
                 break
             }
         }
-        if (match(TokenType.LEFT_BRACKET)) {
-            expr = accessor(expr)
-        }
+
         return expr
     }
 

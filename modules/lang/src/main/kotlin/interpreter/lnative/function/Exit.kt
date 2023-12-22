@@ -2,15 +2,16 @@ package pl.bfelis.llang.language.interpreter.lnative.function
 
 import pl.bfelis.llang.language.interpreter.Interpreter
 import pl.bfelis.llang.language.interpreter.LCallable
+import kotlin.system.exitProcess
 
-object Clock : LCallable {
-    override fun arity(): Int = 0
+object Exit : LCallable {
+    override fun arity(): Int = 1
 
     override fun call(interpreter: Interpreter, arguments: List<Any?>): Any {
-        return System.currentTimeMillis().toDouble()
+        exitProcess((arguments[0] as Number).toInt())
     }
 
     override fun toString(): String {
-        return "<native fn : clock>"
+        return "<native fn : exit>"
     }
 }

@@ -11,6 +11,7 @@ object Globals {
     val values = { env: Environment ->
         mutableMapOf(
             "clock" to Clock,
+            "exit" to Exit,
             "readLine" to ReadLine,
             "printLine" to PrintLine,
             "print" to Print,

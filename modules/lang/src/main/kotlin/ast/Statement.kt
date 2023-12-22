@@ -20,7 +20,7 @@ abstract class Statement {
         fun visitWhileStatement(statement: While, fileName: String? = null): R
     }
 
-    class Block(
+    data class Block(
         val statements: List<Statement?>
     ) : Statement() {
 
@@ -29,7 +29,7 @@ abstract class Statement {
         }
     }
 
-    class Break(
+    data class Break(
         val name: Token
     ) : Statement() {
 
@@ -38,7 +38,7 @@ abstract class Statement {
         }
     }
 
-    class Continue(
+    data class Continue(
         val name: Token
     ) : Statement() {
 
@@ -47,7 +47,7 @@ abstract class Statement {
         }
     }
 
-    class Class(
+    data class Class(
         val name: Token,
         val superclass: Expr.Variable?,
         val methods: List<Statement.Function>,
@@ -59,7 +59,7 @@ abstract class Statement {
         }
     }
 
-    class Expression(
+    data class Expression(
         val expression: Expr
     ) : Statement() {
 
@@ -68,7 +68,7 @@ abstract class Statement {
         }
     }
 
-    class Function(
+    data class Function(
         val name: Token,
         val params: List<Token>,
         val body: List<Statement?>,
@@ -80,7 +80,7 @@ abstract class Statement {
         }
     }
 
-    class For(
+    data class For(
         val `in`: Expr.In,
         val body: Statement
     ) : Statement() {
@@ -90,7 +90,7 @@ abstract class Statement {
         }
     }
 
-    class If(
+    data class If(
         val condition: Expr,
         val thenBranch: Statement,
         val elseBranch: Statement?
@@ -101,7 +101,7 @@ abstract class Statement {
         }
     }
 
-    class Import(
+    data class Import(
         val name: Token
     ) : Statement() {
 
@@ -110,7 +110,7 @@ abstract class Statement {
         }
     }
 
-    class Return(
+    data class Return(
         val keyword: Token,
         val value: Expr?
     ) : Statement() {
@@ -120,7 +120,7 @@ abstract class Statement {
         }
     }
 
-    class Var(
+    data class Var(
         val name: Token,
         val initializer: Expr?
     ) : Statement() {
@@ -130,7 +130,7 @@ abstract class Statement {
         }
     }
 
-    class Val(
+    data class Val(
         val name: Token,
         val initializer: Expr?
     ) : Statement() {
@@ -140,7 +140,7 @@ abstract class Statement {
         }
     }
 
-    class ListSpread(
+    data class ListSpread(
         val names: List<Token>,
         val initializer: Expr,
         val isVal: Boolean
@@ -151,7 +151,7 @@ abstract class Statement {
         }
     }
 
-    class While(
+    data class While(
         val condition: Expr,
         val body: Statement
     ) : Statement() {

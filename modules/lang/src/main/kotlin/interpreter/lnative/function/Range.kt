@@ -9,8 +9,8 @@ object Range : LCallable {
     override fun arity(): Int = 2
 
     override fun call(interpreter: Interpreter, arguments: List<Any?>): Any {
-        val start = arguments[0] as Double
-        val end = arguments[1] as Double
+        val start = (arguments[0] as Number).toDouble()
+        val end = (arguments[1] as Number).toDouble()
         return RangeInstance(LRange(interpreter.environment), start, end)
     }
 }

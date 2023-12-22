@@ -16,7 +16,7 @@ val ArrayMethods = { env: Environment ->
 
 class LArray(env: Environment) : LNativeClass("Array", null, env, ArrayMethods(env)) {
     override fun call(interpreter: Interpreter, arguments: List<Any?>): Any {
-        val size = (arguments[0] as Double).toInt()
+        val size = (arguments[0] as Number).toInt()
         return ArrayInstance(this, size)
     }
 }
