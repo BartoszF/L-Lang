@@ -88,7 +88,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
             TokenType.BANG_EQUAL -> return !isEqual(left, right)
             TokenType.EQUAL_EQUAL -> return isEqual(left, right)
             else -> {
-                throw RuntimeError(expr.operator, "Wrong binary expresion")
+                throw RuntimeError(expr.operator, "Wrong binary expression")
             } // TODO: More exhaustive error
         }
     }
@@ -178,10 +178,8 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
     }
 
     override fun visitListSpreadStatement(statement: Statement.ListSpread, fileName: String?) {
-        val value = evaluate(statement.initializer)
-
         val iterator =
-            when (value) {
+            when (val value = evaluate(statement.initializer)) {
                 is LIterable -> {
                     value
                 }
@@ -612,7 +610,7 @@ class Interpreter : Expr.Visitor<Any?>, Statement.Visitor<Unit> {
         }
     }
 
-    fun lookupVariable(name: Token, expr: Expr): Any? {
+    private fun lookupVariable(name: Token, expr: Expr): Any? {
         val distance = locals[expr]
         return if (distance != null) {
             environment.getAt(distance, name.lexeme)

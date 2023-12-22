@@ -11,3 +11,10 @@ fun sourceShouldParseTo(source: String, statements: List<Statement?>) {
 
     assertEquals(statements, parser.parse())
 }
+
+fun sourceShouldParseTo(source: String) {
+    val scanner = Scanner(source)
+    val parser = Parser(scanner.scanTokens(), null)
+
+    println(parser.parse())
+}

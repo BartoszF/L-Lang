@@ -71,7 +71,11 @@ class Parser(private val tokens: List<Token>, val fileName: String?) {
         val isStatic = if (peek().type == TokenType.STATIC) { // Proper use in class
             advance()
             true
-        } else previous(2).type == TokenType.STATIC // Not proper use, outside of class or no static at all
+        } else try {
+            previous(2).type == TokenType.STATIC
+        } catch (ex: Throwable) {
+            false
+        } // Not proper use, outside of class or no static at all
 
         val name = consume(TokenType.IDENTIFIER, "Expect $kind name.")
         consume(TokenType.LEFT_PAREN, "Expect '(' after $kind name.")
